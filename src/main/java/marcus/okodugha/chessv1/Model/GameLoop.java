@@ -13,9 +13,6 @@ public class GameLoop {
 
     public void loop(Board board, BoardView boardView){
             boardView.showBoard();
-        while (true){
 
-
-        }
     }
 }

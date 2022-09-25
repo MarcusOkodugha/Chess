@@ -1,5 +1,9 @@
 package marcus.okodugha.chessv1.View;
 
+import java.awt.*;
+
+import static marcus.okodugha.chessv1.Model.Board.column;
+
 public class Trash {
 //    JPanel pn = new JPanel() {//shows board
 //            @Override
@@ -45,5 +49,26 @@ public class Trash {
 //                }
 //            }
 //        };
+
+
+
+//     for(int i = 0; i < row; i++) {
+//        for(int j = 0; j < column; j++) {
+//            if(e.getSource() ==(numberTiles[i][j]) ) {
+//                System.out.println("pressed "+i+" "+j);
+//                // we got the row and column - now call the appropriate controller method
+//                numberTiles[i][j].setBackground(Color.RED);
+//                srcRow=i;
+//                srcColumn=j;
+//            }
+//            if (pressCount==2){
+//                board.movePiece(0,0,3,3);
+////                            board.movePiece(srcRow,srcColumn,i,j);
+////                            showBoard();
+////                        sudokuController.handelTileClick(i,j);
+////                        return;
+//            }
+//        }
+//    }
 
 }

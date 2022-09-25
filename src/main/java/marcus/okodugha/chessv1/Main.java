@@ -16,9 +16,9 @@ public class Main {
         Board board = new Board();
         BoardView boardView = new BoardView(board);
         GameLoop gameLoop = new GameLoop(board,boardView);
-        board.movePiece(0,0,3,3);
 
 
-        board.showBoardInTerminal();
+//        board.movePiece(0,0,3,3);
+//        board.showBoardInTerminal();
     }
 }
