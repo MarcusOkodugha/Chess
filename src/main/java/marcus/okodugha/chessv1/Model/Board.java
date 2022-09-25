@@ -7,17 +7,23 @@ public class Board {
     public static final int row = 8;
     private ArrayList<ArrayList<Piece>> board;
     private Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
-
+    Rules rules;
     public Board() {
         board= new ArrayList<>();
+        this.rules = new Rules(this);
         initBoard();
     }
 
-    public void movePiece(int srcRow,int srcColumn,int destRow,int destColumn){
+    public void movePiece(int srcX,int srcY,int destX,int destY){
+        if (rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
+            board.get(srcY).get(srcX).firstMove=false;
+            board.get(destY).set(destX,board.get(srcY).get(srcX));
+            board.get(srcY).set(srcX,emptyPiece);
 
-        board.get(destRow).set(destColumn,board.get(srcRow).get(srcColumn));
+        }else {
+            System.out.println("illegal move");
+        }
 
-        board.get(srcRow).set(srcColumn,emptyPiece);
     }
 
     private void initBoard(){
@@ -34,29 +40,30 @@ public class Board {
 
         //fil board with pawns
         for (int i = 0; i < row; i++) {
-            board.get(1).set(i,new Piece(Color.WHITE,PieceType.PAWN,5));
-            board.get(6).set(i,new Piece(Color.BLACK,PieceType.PAWN,11));
+            board.get(1).set(i,new Piece(Color.BLACK,PieceType.PAWN,11));
+            board.get(6).set(i,new Piece(Color.WHITE,PieceType.PAWN,5));
         }
 
         //white back row
-        board.get(0).set(0,new Piece(Color.WHITE,PieceType.ROOK,4));
-        board.get(0).set(1,new Piece(Color.WHITE,PieceType.KNIGHT,3));
-        board.get(0).set(2,new Piece(Color.WHITE,PieceType.BISHOP,2));
-        board.get(0).set(3,new Piece(Color.WHITE,PieceType.KING,0));
-        board.get(0).set(4,new Piece(Color.WHITE,PieceType.QUEEN,1));
-        board.get(0).set(5,new Piece(Color.WHITE,PieceType.BISHOP,2));
-        board.get(0).set(6,new Piece(Color.WHITE,PieceType.KNIGHT,3));
-        board.get(0).set(7,new Piece(Color.WHITE,PieceType.ROOK,4));
+        board.get(7).set(0,new Piece(Color.WHITE,PieceType.ROOK,4));
+        board.get(7).set(1,new Piece(Color.WHITE,PieceType.KNIGHT,3));
+        board.get(7).set(2,new Piece(Color.WHITE,PieceType.BISHOP,2));
+        board.get(7).set(3,new Piece(Color.WHITE,PieceType.QUEEN,1));
+        board.get(7).set(4,new Piece(Color.WHITE,PieceType.KING,0));
+        board.get(7).set(5,new Piece(Color.WHITE,PieceType.BISHOP,2));
+        board.get(7).set(6,new Piece(Color.WHITE,PieceType.KNIGHT,3));
+        board.get(7).set(7,new Piece(Color.WHITE,PieceType.ROOK,4));
         //black back row
-        board.get(7).set(0,new Piece(Color.BLACK,PieceType.ROOK,10));
-        board.get(7).set(1,new Piece(Color.BLACK,PieceType.KNIGHT,9));
-        board.get(7).set(2,new Piece(Color.BLACK,PieceType.BISHOP,8));
-        board.get(7).set(3,new Piece(Color.BLACK,PieceType.KING,6));
-        board.get(7).set(4,new Piece(Color.BLACK,PieceType.QUEEN,7));
-        board.get(7).set(5,new Piece(Color.BLACK,PieceType.BISHOP,8));
-        board.get(7).set(6,new Piece(Color.BLACK,PieceType.KNIGHT,9));
-        board.get(7).set(7,new Piece(Color.BLACK,PieceType.ROOK,10));
+        board.get(0).set(0,new Piece(Color.BLACK,PieceType.ROOK,10));
+        board.get(0).set(1,new Piece(Color.BLACK,PieceType.KNIGHT,9));
+        board.get(0).set(2,new Piece(Color.BLACK,PieceType.BISHOP,8));
+        board.get(0).set(3,new Piece(Color.BLACK,PieceType.QUEEN,7));
+        board.get(0).set(4,new Piece(Color.BLACK,PieceType.KING,6));
+        board.get(0).set(5,new Piece(Color.BLACK,PieceType.BISHOP,8));
+        board.get(0).set(6,new Piece(Color.BLACK,PieceType.KNIGHT,9));
+        board.get(0).set(7,new Piece(Color.BLACK,PieceType.ROOK,10));
     }
+
 
     public void showBoardInTerminal(){
         for (int i = 0; i < row; i++) {

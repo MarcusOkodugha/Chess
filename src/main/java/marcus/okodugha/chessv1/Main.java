@@ -12,9 +12,9 @@ import static marcus.okodugha.chessv1.Model.Board.row;
 public class Main {
     public static void main(String[] args) throws IOException {
 
-
-        Board board = new Board();
-        BoardView boardView = new BoardView(board);
+        Board board = new Board();//one instance
+        Rules rules = new Rules(board);//can be multiple instance
+        BoardView boardView = new BoardView(board);//one instance
         GameLoop gameLoop = new GameLoop(board,boardView);
 
 

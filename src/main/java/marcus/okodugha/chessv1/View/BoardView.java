@@ -29,6 +29,7 @@ public class BoardView  {
         JFrame frame = new JFrame();
         BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
         Image imgs[] = new Image[12];
+        Icon imgsIcons[] = new Icon[12];
         JLabel[][] numberTiles;
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel();
@@ -36,8 +37,8 @@ public class BoardView  {
         JPanel panel4 = new JPanel();
         JPanel panel5 = new JPanel();
         int pressCount=0;
-        int srcRow=0;
-        int srcColumn=0;
+        int srcX=0;
+        int srcY=0;
         int destRow=0;
         int destColumn=0;
 
@@ -48,8 +49,8 @@ public class BoardView  {
     }
 
     public void initBoardView() throws IOException {
-
-        frame.setSize(528,552);
+        frame.setBounds(10,10,512,512);
+//        frame.setSize(528,552);
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
 
@@ -57,6 +58,7 @@ public class BoardView  {
         for (int i = 0; i < 400; i += 200) {
             for (int j = 0; j < 1200; j += 200) {
                 imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH);
+                imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH));
                 ind++;
             }
         }
@@ -83,13 +85,14 @@ public class BoardView  {
     public void showBoard(){
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(row,column));
-        Color lightBlueColor = new Color(116, 171, 228);
+        Color lightBlueColor = new Color(235, 233,210);
+        Color beige = new Color(75, 115, 153);
         boolean white = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 JLabel tile = new JLabel();
                 if (white) {
-                    tile.setBackground(Color.white);
+                    tile.setBackground(beige);
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
@@ -119,6 +122,21 @@ public class BoardView  {
         frame.setVisible(true);
 
     }
+
+    public void show(){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if(board.getBoard().get(i).get(j).getImageIndex() != 12){
+                    numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+                }
+                if (board.getBoard().get(i).get(j).getImageIndex() == 12){
+                    numberTiles[i][j].setIcon(null);
+                }
+            }
+        }
+
+    }
+
     MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
@@ -134,34 +152,36 @@ public class BoardView  {
     MouseListener mouseListener = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
+//            pressCount++;
+//            if (pressCount==1){
+//                srcX=e.getX()/64;
+//                srcY=e.getY()/64;
+//
+//            }
+//            if (pressCount==2){
+//                board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
+//                show();
+//            }
         }
-
         @Override
         public void mousePressed(MouseEvent e) {
-//            System.out.println(e.getPoint());
-            System.out.println("get x " +e.getX()+"get y "+e.getY());
-            System.out.println(e.getX()/64 +" "+e.getY()/64);
-            numberTiles[e.getY()/64][e.getX()/64].setBackground(Color.RED);
+            srcX=e.getX()/64;
+            srcY=e.getY()/64;
         }
-
         @Override
         public void mouseReleased(MouseEvent e) {
-
+            board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
+            show();
         }
-
         @Override
         public void mouseEntered(MouseEvent e) {
 
         }
-
         @Override
         public void mouseExited(MouseEvent e) {
 
         }
     };
-//    public static Piece(int x, int y){
-//
-//    }
 
 
 
