@@ -5,6 +5,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import marcus.okodugha.chessv1.Model.Board;
 import marcus.okodugha.chessv1.Model.Piece;
+import marcus.okodugha.chessv1.Model.PieceType;
 
 //import java.awt.event.MouseEvent;
 import java.awt.event.MouseEvent;
@@ -31,6 +32,8 @@ public class BoardView  {
         Image imgs[] = new Image[12];
         Icon imgsIcons[] = new Icon[12];
         JLabel[][] numberTiles;
+        JPanel panel = new JPanel();
+
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel();
         JPanel panel3 = new JPanel();
@@ -83,7 +86,6 @@ public class BoardView  {
     }
 
     public void showBoard(){
-        JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(row,column));
         Color lightBlueColor = new Color(235, 233,210);
         Color beige = new Color(75, 115, 153);
@@ -163,10 +165,23 @@ public class BoardView  {
 //                show();
 //            }
         }
+        boolean mousePressed = false;
+        PointerInfo pointerInfo = MouseInfo.getPointerInfo();
         @Override
         public void mousePressed(MouseEvent e) {
+            mousePressed=true;
+            System.out.println("mouse pressed");
             srcX=e.getX()/64;
             srcY=e.getY()/64;
+            //code is trying to get icon to stick to mouse position
+//            if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
+////                while (mousePressed){
+//                    System.out.println("mouse x: "+pointerInfo.getLocation().x+" mouse y: "+pointerInfo.getLocation().y);
+//                    imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()].paintIcon(panel,frame.getGraphics(), pointerInfo.getLocation().x,pointerInfo.getLocation().y);
+////                }
+//
+//            }
+//            show();//todo chek if redundet call
         }
         @Override
         public void mouseReleased(MouseEvent e) {
