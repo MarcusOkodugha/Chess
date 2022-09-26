@@ -8,6 +8,7 @@ public class Board {
     private ArrayList<ArrayList<Piece>> board;
     private Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
     Rules rules;
+    static int nrOfMoves=0;
     public Board() {
         board= new ArrayList<>();
         this.rules = new Rules(this);
@@ -19,7 +20,8 @@ public class Board {
             board.get(srcY).get(srcX).firstMove=false;
             board.get(destY).set(destX,board.get(srcY).get(srcX));
             board.get(srcY).set(srcX,emptyPiece);
-
+            nrOfMoves++;
+            System.out.println("nr of moves: "+nrOfMoves);
         }else {
             System.out.println("illegal move");
         }
