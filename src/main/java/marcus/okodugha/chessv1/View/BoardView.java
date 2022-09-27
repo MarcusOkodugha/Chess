@@ -1,11 +1,9 @@
 package marcus.okodugha.chessv1.View;
 
-import javafx.event.EventHandler;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import marcus.okodugha.chessv1.Model.Board;
 import marcus.okodugha.chessv1.Model.Piece;
 import marcus.okodugha.chessv1.Model.PieceType;
+import marcus.okodugha.chessv1.Model.Rules;
 
 //import java.awt.event.MouseEvent;
 import java.awt.event.MouseEvent;
@@ -21,8 +19,6 @@ import static marcus.okodugha.chessv1.Model.Board.row;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class BoardView  {
         Board board;
@@ -42,12 +38,18 @@ public class BoardView  {
         int pressCount=0;
         int srcX=0;
         int srcY=0;
+        Rules rules;
         int destRow=0;
         int destColumn=0;
+        private Piece emptyPiece = new Piece(marcus.okodugha.chessv1.Model.Color.NOCOLOR,PieceType.EMPTY,12);
+
+    PointerInfo pointerInfo = MouseInfo.getPointerInfo();
 
 
-    public BoardView(Board board) throws IOException {
+
+    public BoardView(Board board, Rules rules) throws IOException {
         this.board = board;
+        this.rules = rules;
         initBoardView();
     }
 
@@ -61,7 +63,11 @@ public class BoardView  {
         for (int i = 0; i < 400; i += 200) {
             for (int j = 0; j < 1200; j += 200) {
                 imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH);
-                imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH));
+                if (ind==4){
+                }else {
+
+                }
+                    imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH));
                 ind++;
             }
         }
@@ -134,23 +140,34 @@ public class BoardView  {
                 if (board.getBoard().get(i).get(j).getImageIndex() == 12){
                     numberTiles[i][j].setIcon(null);
                 }
+                int k=0;
+                for (Point p:rules.legalMoves) {
+                    numberTiles[rules.legalMoves.get(k).x][rules.legalMoves.get(k).y].setBackground(Color.GREEN);
+                    k++;
+                }
             }
         }
 
     }
+        boolean firstLoop = true;
+        Icon holdingPieceIcon = null;
 
-    MouseMotionListener mouseMotionListener = new MouseMotionListener() {
+        MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
 
+            currentTime++;
+            if (lastTime+5<currentTime){
+                panel.repaint();
+                lastTime=currentTime;
+            }
+                paintOnMouse(holdingPieceIcon,e);
         }
-
         @Override
         public void mouseMoved(MouseEvent e) {
 
         }
     };
-
     MouseListener mouseListener = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -165,28 +182,27 @@ public class BoardView  {
 //                show();
 //            }
         }
-        boolean mousePressed = false;
-        PointerInfo pointerInfo = MouseInfo.getPointerInfo();
         @Override
         public void mousePressed(MouseEvent e) {
-            mousePressed=true;
             System.out.println("mouse pressed");
             srcX=e.getX()/64;
             srcY=e.getY()/64;
-            //code is trying to get icon to stick to mouse position
-//            if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
-////                while (mousePressed){
-//                    System.out.println("mouse x: "+pointerInfo.getLocation().x+" mouse y: "+pointerInfo.getLocation().y);
-//                    imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()].paintIcon(panel,frame.getGraphics(), pointerInfo.getLocation().x,pointerInfo.getLocation().y);
-////                }
-//
-//            }
-//            show();//todo chek if redundet call
+//            code is trying to get icon to stick to mouse position
+
+            if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
+
+                    holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
+            }
+
+//           show();//todo chek if redundet call
         }
         @Override
         public void mouseReleased(MouseEvent e) {
             board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
+
+            panel.repaint();
             show();
+
         }
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -197,6 +213,15 @@ public class BoardView  {
 
         }
     };
+    int xMouseOffset =32;
+    int yMouseOffset=32;
+    static int currentTime=0;
+    static int lastTime=0;
+    private void paintOnMouse(Icon icon, MouseEvent e){
+        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+
+    }
+
 
 
 

@@ -15,6 +15,17 @@ public class Board {
         initBoard();
     }
 
+//    public void movePiece(int srcX,int srcY,int destX,int destY){
+//        if (rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
+//            board.get(srcY).get(srcX).firstMove=false;
+//            board.get(destY).set(destX,board.get(srcY).get(srcX));
+//            board.get(srcY).set(srcX,emptyPiece);
+//            nrOfMoves++;
+//            System.out.println("nr of moves: "+nrOfMoves);
+//        }else {
+//            System.out.println("illegal move");
+//        }
+//    }
     public void movePiece(int srcX,int srcY,int destX,int destY){
         if (rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
             board.get(srcY).get(srcX).firstMove=false;
@@ -25,6 +36,9 @@ public class Board {
         }else {
             System.out.println("illegal move");
         }
+    }
+
+    public void getLegalMoves(int srcX,int srcY,Piece piece){
 
     }
 

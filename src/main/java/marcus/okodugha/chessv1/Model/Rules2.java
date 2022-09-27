@@ -3,7 +3,7 @@ package marcus.okodugha.chessv1.Model;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Rules {
+public class Rules2 {
     private Board board;
     private Point intersectionPoint = new Point();
 
@@ -14,7 +14,7 @@ public class Rules {
         return legalMoves;
     }
 
-    public Rules(Board board) {
+    public Rules2(Board board) {
         this.board = board;
 
         legalMoves.add(new Point(5,7));
@@ -107,12 +107,12 @@ public class Rules {
     }
 
     private boolean isKnightMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece){
-            //2up och 1vänster                   2up och 1höger               1up och 2 höger                 1ner 2höger                      2ner 1 höger                     2ner 1vänser                 1ner 2 vänster                   1up 2vänster
+        //2up och 1vänster                   2up och 1höger               1up och 2 höger                 1ner 2höger                      2ner 1 höger                     2ner 1vänser                 1ner 2 vänster                   1up 2vänster
         if ((srcX-1==destX&&srcY-2==destY)||(srcX+1==destX&&srcY-2==destY)||(srcX+2==destX&&srcY-1==destY)||(srcX+2==destX&&srcY+1==destY)||(srcX+1==destX&&srcY+2==destY)||(srcX-1==destX&&srcY+2==destY)||(srcX-2==destX&&srcY+1==destY)||(srcX-2==destX&&srcY-1==destY)){
             if (destIsEmpty(destX, destY)) return true;
             if (!destPieceIsSameColor(destX, destY, piece)) return true;
         }
-            return false;
+        return false;
     }
     //basic rules
     private boolean moveIsForward(int srcY, int destY) {
@@ -182,7 +182,7 @@ public class Rules {
                         System.out.println("illegal up move");
                     }
                     System.out.println("adding points ");
-                            legalMoves.add(new Point(5,6));
+                    legalMoves.add(new Point(5,6));
 
                 }
             }
@@ -231,7 +231,7 @@ public class Rules {
                 }
             }
             if (srcX < destX && srcY > destY) {//right and up
-                    System.out.println("move is right and up ");//todo remove
+                System.out.println("move is right and up ");//todo remove
                 for (int i = srcX+1; i < destX; i++) {
                     if (board.getBoard().get(diagonalY-1).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i+1;
