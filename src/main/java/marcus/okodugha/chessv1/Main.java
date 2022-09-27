@@ -14,6 +14,7 @@ public class Main {
 
         Board board = new Board();//one instance
         Rules rules = new Rules(board);//can be multiple instance
+//        Rules2 rules2 = new Rules2(board);//can be multiple instance todo remove
         BoardView boardView = new BoardView(board,rules);//one instance
         GameLoop gameLoop = new GameLoop(board,boardView);
 

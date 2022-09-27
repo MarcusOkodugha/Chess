@@ -1,11 +1,9 @@
 package marcus.okodugha.chessv1.View;
 
-import marcus.okodugha.chessv1.Model.Board;
-import marcus.okodugha.chessv1.Model.Piece;
-import marcus.okodugha.chessv1.Model.PieceType;
-import marcus.okodugha.chessv1.Model.Rules;
+import marcus.okodugha.chessv1.Model.*;
 
 //import java.awt.event.MouseEvent;
+import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -71,30 +69,24 @@ public class BoardView  {
                 ind++;
             }
         }
-
         //testing
         panel1.setBackground(Color.GRAY);
         panel1.setPreferredSize(new Dimension(100,100));
-
         panel2.setBackground(Color.GRAY);
         panel2.setPreferredSize(new Dimension(100,100));
-
         panel3.setBackground(Color.GRAY);
         panel3.setPreferredSize(new Dimension(100,100));
-
         panel4.setBackground(Color.GRAY);
         panel4.setPreferredSize(new Dimension(100,100));
-
         panel5.setBackground(Color.MAGENTA);
         panel5.setPreferredSize(new Dimension(100,100));
 
-
     }
 
-    public void showBoard(){
-        panel.setLayout(new GridLayout(row,column));
         Color lightBlueColor = new Color(235, 233,210);
         Color beige = new Color(75, 115, 153);
+    public void showBoard(){
+        panel.setLayout(new GridLayout(row,column));
         boolean white = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -105,14 +97,12 @@ public class BoardView  {
                     tile.setBackground(lightBlueColor);
                 }
                 tile.setBounds(i*64,j*64,64,64);
-
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
                     tile.setIcon(icon);
                 }
                 numberTiles[i][j]=tile;
                 numberTiles[i][j].setOpaque(true);
-
                 panel.add(numberTiles[i][j]);
                 white = !white;
             }
@@ -132,24 +122,28 @@ public class BoardView  {
     }
 
     public void show(){
+        boolean white = true;
+
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+                if (white) {
+                    numberTiles[i][j].setBackground(beige);
+                } else {
+                    numberTiles[i][j].setBackground(lightBlueColor);
+                }
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
                 }
                 if (board.getBoard().get(i).get(j).getImageIndex() == 12){
                     numberTiles[i][j].setIcon(null);
                 }
-                int k=0;
-                for (Point p:rules.legalMoves) {
-                    numberTiles[rules.legalMoves.get(k).x][rules.legalMoves.get(k).y].setBackground(Color.GREEN);
-                    k++;
-                }
+                white = !white;
             }
+            white = !white;
+
         }
 
     }
-        boolean firstLoop = true;
         Icon holdingPieceIcon = null;
 
         MouseMotionListener mouseMotionListener = new MouseMotionListener() {
@@ -171,46 +165,41 @@ public class BoardView  {
     MouseListener mouseListener = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
-//            pressCount++;
-//            if (pressCount==1){
-//                srcX=e.getX()/64;
-//                srcY=e.getY()/64;
-//
-//            }
-//            if (pressCount==2){
-//                board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
-//                show();
-//            }
+
         }
         @Override
-        public void mousePressed(MouseEvent e) {
-            System.out.println("mouse pressed");
-            srcX=e.getX()/64;
+            public void mousePressed(MouseEvent e) {
+                System.out.println("mouse pressed");
+                srcX=e.getX()/64;
             srcY=e.getY()/64;
-//            code is trying to get icon to stick to mouse position
-
             if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
-
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
             }
-
+            //legalMoves
+            show();
+            int k=0;
+            for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
+                if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
+                }else {
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
+                }
+                k++;
+            }
+            board.legalMoves.clear();
 //           show();//todo chek if redundet call
         }
         @Override
         public void mouseReleased(MouseEvent e) {
             board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
-
             panel.repaint();
             show();
-
         }
         @Override
         public void mouseEntered(MouseEvent e) {
-
         }
         @Override
         public void mouseExited(MouseEvent e) {
-
         }
     };
     int xMouseOffset =32;

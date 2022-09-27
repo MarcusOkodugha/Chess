@@ -10,7 +10,9 @@ public class Rules2 {
     public ArrayList<Point> legalMoves = new ArrayList<Point>();
 
 
-    public ArrayList<Point> getLegalMoves() {
+    public ArrayList<Point> getLegalMoves(int srcX, int srcY,Piece piece) {
+
+
         return legalMoves;
     }
 

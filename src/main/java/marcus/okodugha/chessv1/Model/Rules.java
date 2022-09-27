@@ -7,17 +7,11 @@ public class Rules {
     private Board board;
     private Point intersectionPoint = new Point();
 
-    public ArrayList<Point> legalMoves = new ArrayList<Point>();
 
-
-    public ArrayList<Point> getLegalMoves() {
-        return legalMoves;
-    }
 
     public Rules(Board board) {
         this.board = board;
 
-        legalMoves.add(new Point(5,7));
 
 //        legalMoves.add(new Point(4,7));
 
@@ -181,9 +175,6 @@ public class Rules {
                         intersectionPoint.y = i;
                         System.out.println("illegal up move");
                     }
-                    System.out.println("adding points ");
-                            legalMoves.add(new Point(5,6));
-
                 }
             }
             if (srcY < destY) {//move down

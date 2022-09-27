@@ -1,5 +1,6 @@
 package marcus.okodugha.chessv1.Model;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 public class Board {
@@ -9,23 +10,26 @@ public class Board {
     private Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
     Rules rules;
     static int nrOfMoves=0;
+    public ArrayList<Point> legalMoves = new ArrayList<Point>();
+
+
+
     public Board() {
         board= new ArrayList<>();
         this.rules = new Rules(this);
         initBoard();
     }
+    public ArrayList<Point> getLegalMoves(int srcX,int srcY,Piece piece) {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                if (rules.isLegalMove(srcX,srcY,j,i,board.get(srcY).get(srcX))){
+                    legalMoves.add(new Point(j,i));
+                }
+            }
+        }
+        return legalMoves;
+    }
 
-//    public void movePiece(int srcX,int srcY,int destX,int destY){
-//        if (rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
-//            board.get(srcY).get(srcX).firstMove=false;
-//            board.get(destY).set(destX,board.get(srcY).get(srcX));
-//            board.get(srcY).set(srcX,emptyPiece);
-//            nrOfMoves++;
-//            System.out.println("nr of moves: "+nrOfMoves);
-//        }else {
-//            System.out.println("illegal move");
-//        }
-//    }
     public void movePiece(int srcX,int srcY,int destX,int destY){
         if (rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
             board.get(srcY).get(srcX).firstMove=false;
@@ -38,9 +42,7 @@ public class Board {
         }
     }
 
-    public void getLegalMoves(int srcX,int srcY,Piece piece){
 
-    }
 
     private void initBoard(){
         for (int i = 0; i < row; i++) {
