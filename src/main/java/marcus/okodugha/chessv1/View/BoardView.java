@@ -176,6 +176,7 @@ public class BoardView  {
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
             }
             //legalMoves
+//            Color greenLight = new Color(100, 0, 100, 0)
             show();
             int k=0;
             for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {

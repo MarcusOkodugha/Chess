@@ -43,7 +43,6 @@ public class Board {
     }
 
 
-
     private void initBoard(){
         for (int i = 0; i < row; i++) {
             board.add(new ArrayList<Piece>());
