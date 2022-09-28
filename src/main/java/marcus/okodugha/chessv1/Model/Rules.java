@@ -7,12 +7,8 @@ public class Rules {
     private Board board;
     private Point intersectionPoint = new Point();
 
-
-
     public Rules(Board board) {
         this.board = board;
-
-
 //        legalMoves.add(new Point(4,7));
 
     }
@@ -99,7 +95,6 @@ public class Rules {
             }
         }return false;
     }
-
     private boolean isKnightMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece){
             //2up och 1vänster                   2up och 1höger               1up och 2 höger                 1ner 2höger                      2ner 1 höger                     2ner 1vänser                 1ner 2 vänster                   1up 2vänster
         if ((srcX-1==destX&&srcY-2==destY)||(srcX+1==destX&&srcY-2==destY)||(srcX+2==destX&&srcY-1==destY)||(srcX+2==destX&&srcY+1==destY)||(srcX+1==destX&&srcY+2==destY)||(srcX-1==destX&&srcY+2==destY)||(srcX-2==destX&&srcY+1==destY)||(srcX-2==destX&&srcY-1==destY)){
@@ -146,8 +141,8 @@ public class Rules {
         return board.getBoard().get(destY).get(destX).getColor() == piece.getColor();
     }
     private Point intersection(int srcX, int srcY, int destX, int destY) {
-        intersectionPoint.x=0;
-        intersectionPoint.y=0;
+        intersectionPoint.x=-1;//if intersection point is -1 then ther is no intersection point
+        intersectionPoint.y=-1;
         if (moveIsStraight(srcX, srcY, destX, destY)) {//straight move
             System.out.println("move is straight");
             if (srcX > destX) {//move is left
@@ -237,7 +232,7 @@ public class Rules {
 
         if ((intersectionPoint.x==destX&&intersectionPoint.y==destY)&&isEnemy(srcX,srcY,destX,destY))return null;//is enemy kill
 
-        if (intersectionPoint.x !=0) return intersectionPoint;
+        if (intersectionPoint.x !=-1&& intersectionPoint.y!=-1) return intersectionPoint;
 
         return null;
     }

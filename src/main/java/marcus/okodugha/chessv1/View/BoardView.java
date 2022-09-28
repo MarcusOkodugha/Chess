@@ -40,6 +40,7 @@ public class BoardView  {
         int destRow=0;
         int destColumn=0;
         private Piece emptyPiece = new Piece(marcus.okodugha.chessv1.Model.Color.NOCOLOR,PieceType.EMPTY,12);
+        private int biggerSize=30;
 
     PointerInfo pointerInfo = MouseInfo.getPointerInfo();
 
@@ -52,7 +53,7 @@ public class BoardView  {
     }
 
     public void initBoardView() throws IOException {
-        frame.setBounds(10,10,512,512);
+        frame.setBounds(10,10,752,752);
 //        frame.setSize(528,552);
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
@@ -60,12 +61,12 @@ public class BoardView  {
         int ind = 0;
         for (int i = 0; i < 400; i += 200) {
             for (int j = 0; j < 1200; j += 200) {
-                imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH);
+                imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance(64+biggerSize, 64+biggerSize, BufferedImage.SCALE_SMOOTH);
                 if (ind==4){
                 }else {
 
                 }
-                    imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64, 64, BufferedImage.SCALE_SMOOTH));
+                    imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64+biggerSize, 64+biggerSize, BufferedImage.SCALE_SMOOTH));
                 ind++;
             }
         }
@@ -96,7 +97,7 @@ public class BoardView  {
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
-                tile.setBounds(i*64,j*64,64,64);
+                tile.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
                     tile.setIcon(icon);
@@ -153,48 +154,72 @@ public class BoardView  {
             currentTime++;
             if (lastTime+5<currentTime){
                 panel.repaint();
+                if (holdingPieceIcon!=null){
+
+                    paintOnMouse(holdingPieceIcon,e);
+                }
                 lastTime=currentTime;
             }
+            if (holdingPieceIcon!=null){
+
                 paintOnMouse(holdingPieceIcon,e);
+            }
         }
         @Override
         public void mouseMoved(MouseEvent e) {
 
         }
     };
+    Point activPoint = new Point(-1,-1);
+
     MouseListener mouseListener = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
 
+            if (activPoint.x!=-1&&activPoint.y!=-1){//second click
+                System.out.println("second click");
+                board.movePiece(activPoint.x,activPoint.y,e.getX()/(64+biggerSize),e.getY()/(64+biggerSize));
+                board.legalMoves.clear();
+                show();
+                activPoint.x=-1;
+                activPoint.y=-1;
+            }
+            if (activPoint.x==-1&&activPoint.y==-1){//first click
+                System.out.println("first click");
+
+                srcX=e.getX()/(64+biggerSize);
+                srcY=e.getY()/(64+biggerSize);
+
+                show();
+                showLegalMoves(e);
+                activPoint.x=srcX;
+                activPoint.y=srcY;
+            }
         }
         @Override
             public void mousePressed(MouseEvent e) {
-                System.out.println("mouse pressed");
-                srcX=e.getX()/64;
-            srcY=e.getY()/64;
+            System.out.println("mouse pressed");
+            srcX=e.getX()/(64+biggerSize);
+            srcY=e.getY()/(64+biggerSize);
+//            System.out.println("mouse pressed on tile x = "+srcX+" y= "+srcY);
             if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
             }
-            //legalMoves
-//            Color greenLight = new Color(100, 0, 100, 0)
+            // show legalMoves
             show();
-            int k=0;
-            for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
-                if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
-                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
-                }else {
-                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
-                }
-                k++;
-            }
-            board.legalMoves.clear();
-//           show();//todo chek if redundet call
+            showLegalMoves(e);
+
         }
         @Override
         public void mouseReleased(MouseEvent e) {
-            board.movePiece(srcX,srcY,e.getX()/64,e.getY()/64);
-            panel.repaint();
-            show();
+            holdingPieceIcon=null;//reset holdigPieceIcon when mouse is released
+            if (srcX==e.getX()/(64+biggerSize)&&srcY==e.getY()/(64+biggerSize)){//keeps showing legalmoves if mouse is released on srcX srcY
+            showLegalMoves(e);
+            }else {
+                board.movePiece(srcX,srcY,e.getX()/(64+biggerSize),e.getY()/(64+biggerSize));
+                panel.repaint();
+                show();
+            }
         }
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -203,13 +228,30 @@ public class BoardView  {
         public void mouseExited(MouseEvent e) {
         }
     };
-    int xMouseOffset =32;
-    int yMouseOffset=32;
+    int xMouseOffset =32+(biggerSize/2);
+    int yMouseOffset=32+(biggerSize/2);
     static int currentTime=0;
     static int lastTime=0;
     private void paintOnMouse(Icon icon, MouseEvent e){
         icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+    }
 
+    private void showLegalMoves(MouseEvent e){
+        int k=0;
+        for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
+            panel.repaint();
+            if (holdingPieceIcon!=null){
+
+                paintOnMouse(holdingPieceIcon,e);
+            }
+            if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
+                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
+            }else {
+                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
+            }
+            k++;
+        }
+        board.legalMoves.clear();
     }
 
 

@@ -67,8 +67,11 @@ public class Board {
         board.get(7).set(2,new Piece(Color.WHITE,PieceType.BISHOP,2));
         board.get(7).set(3,new Piece(Color.WHITE,PieceType.QUEEN,1));
         board.get(7).set(4,new Piece(Color.WHITE,PieceType.KING,0));
-        board.get(7).set(5,new Piece(Color.WHITE,PieceType.BISHOP,2));
-        board.get(7).set(6,new Piece(Color.WHITE,PieceType.KNIGHT,3));
+//        board.get(7).set(5,new Piece(Color.WHITE,PieceType.BISHOP,2));todo activate
+//        board.get(7).set(6,new Piece(Color.WHITE,PieceType.KNIGHT,3));todo avtivate
+        board.get(7).set(5,new Piece(Color.NOCOLOR,PieceType.EMPTY,12));//todo remove
+        board.get(7).set(6,new Piece(Color.NOCOLOR,PieceType.EMPTY,12));//todo remove
+
         board.get(7).set(7,new Piece(Color.WHITE,PieceType.ROOK,4));
         //black back row
         board.get(0).set(0,new Piece(Color.BLACK,PieceType.ROOK,10));
