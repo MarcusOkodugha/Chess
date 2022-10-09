@@ -71,4 +71,23 @@ public class Trash {
 //        }
 //    }
 
+    //    public ArrayList<Move> getAllLegalMovesForBlack() {
+//        allLegalBlackMoves.clear();
+//        for (int i = 0; i < row; i++) {
+//            for (int j = 0; j < column; j++) {
+//                for (int k = 0; k < row; k++) {
+//                    for (int l = 0; l < column; l++) {
+//                        if (board.get(i).get(j).getColor()==Color.BLACK){
+//                            if (rules.isLegalMove(j,i,l,k,board.get(i).get(j))){
+//                                allLegalBlackMoves.add(new Move(j,i,l,k));
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return allLegalBlackMoves;
+//    }
+
+
 }

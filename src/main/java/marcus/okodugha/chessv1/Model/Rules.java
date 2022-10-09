@@ -1,7 +1,6 @@
 package marcus.okodugha.chessv1.Model;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 public class Rules {
     private Board board;
@@ -46,7 +45,6 @@ public class Rules {
         return false;
     }
 
-    // srcX,srcY,destX,destY //todo remove
     //piece specific rules
     public boolean isPawnMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece) {
         if (moveIsForward(srcY, destY) && piece.getColor() == Color.WHITE || !moveIsForward(srcY, destY) && piece.getColor() == Color.BLACK) {//pawn moves in the right direction depending on color
@@ -70,7 +68,6 @@ public class Rules {
             }
         }return false;
     }
-
     private boolean isRookMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece) {
         if (moveIsStraight(srcX, srcY, destX, destY)) {
             if (intersection(srcX, srcY, destX, destY) == null) {
@@ -79,14 +76,15 @@ public class Rules {
             }
         }return false;
     }
-
     private boolean isKingMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece) {
+        if (piece.firstMove&&isCastlingMove(srcX,srcY,destX,destY,piece)){
+            return true;
+        }
         if (moveIsOneStep(srcX, srcY, destX, destY)) {
             if (destIsEmpty(destX, destY)) return true;
             if (!destPieceIsSameColor(destX, destY, piece)) return true;
         }return false;
     }
-
     private boolean isQueenMoveLegal(int srcX, int srcY, int destX, int destY, Piece piece) {
         if (moveIsStraight(srcX, srcY, destX, destY) || moveIsStraightDiagonal(srcX, srcY, destX, destY)) {
             if (intersection(srcX, srcY, destX, destY) == null) {
@@ -104,6 +102,7 @@ public class Rules {
             return false;
     }
     //basic rules
+
     private boolean moveIsForward(int srcY, int destY) {
         return srcY > destY;
     }
@@ -137,20 +136,20 @@ public class Rules {
     private boolean destIsEmpty(int destX, int destY) {
         return board.getBoard().get(destY).get(destX).getPieceType() == PieceType.EMPTY;//destination squarer is empty
     }
-    private boolean destPieceIsSameColor(int destX, int destY, Piece piece) {
+    public boolean destPieceIsSameColor(int destX, int destY, Piece piece) {
         return board.getBoard().get(destY).get(destX).getColor() == piece.getColor();
     }
     private Point intersection(int srcX, int srcY, int destX, int destY) {
         intersectionPoint.x=-1;//if intersection point is -1 then ther is no intersection point
         intersectionPoint.y=-1;
         if (moveIsStraight(srcX, srcY, destX, destY)) {//straight move
-            System.out.println("move is straight");
+//            System.out.println("move is straight");
             if (srcX > destX) {//move is left
                 for (int i = destX; i < srcX; i++) {
                     if (board.getBoard().get(srcY).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i;
                         intersectionPoint.y = srcY;
-                        System.out.println("illegal left move");
+//                        System.out.println("illegal left move");
                     }
                 }
             }
@@ -159,7 +158,7 @@ public class Rules {
                     if (board.getBoard().get(srcY).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i;
                         intersectionPoint.y = srcY;
-                        System.out.println("illegal right move "+i);
+//                        System.out.println("illegal right move "+i);
                     }
                 }
             }
@@ -168,7 +167,7 @@ public class Rules {
                     if (board.getBoard().get(i).get(srcX).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = srcX;
                         intersectionPoint.y = i;
-                        System.out.println("illegal up move");
+//                        System.out.println("illegal up move");
                     }
                 }
             }
@@ -177,21 +176,20 @@ public class Rules {
                     if (board.getBoard().get(i).get(srcX).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = srcX;
                         intersectionPoint.y = i;
-                        System.out.println("illegal down move "+i);
+//                        System.out.println("illegal down move "+i);
                     }
                 }
             }
         }
-
         if (moveIsStraightDiagonal(srcX, srcY, destX, destY)) {//diagonal moves
-            System.out.println("move is diagonal");
+//            System.out.println("move is diagonal");
             int diagonalY=srcY;
             if (srcX > destX&&srcY < destY) {//move is left and down
                 for (int i = srcX-1; i > destX; i--) {
                     if (board.getBoard().get(diagonalY+1).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i-1;
                         intersectionPoint.y = diagonalY+1;
-                        System.out.println("illegal left and down move "+i);
+//                        System.out.println("illegal left and down move "+i);
                     }
                     diagonalY++;
                 }
@@ -201,7 +199,7 @@ public class Rules {
                     if (board.getBoard().get(diagonalY+1).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i+1;
                         intersectionPoint.y = diagonalY+1;
-                        System.out.println("illegal right and down move "+i);
+//                        System.out.println("illegal right and down move "+i);
                     }
                     diagonalY++;
                 }
@@ -211,19 +209,17 @@ public class Rules {
                     if (board.getBoard().get(diagonalY-1).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i-1;
                         intersectionPoint.y = diagonalY-1;
-                        System.out.println("illegal left and up move "+i);
+//                        System.out.println("illegal left and up move "+i);
                     }
                     diagonalY--;
                 }
             }
             if (srcX < destX && srcY > destY) {//right and up
-                    System.out.println("move is right and up ");//todo remove
                 for (int i = srcX+1; i < destX; i++) {
                     if (board.getBoard().get(diagonalY-1).get(i).getPieceType()!=PieceType.EMPTY) {
                         intersectionPoint.x = i+1;
                         intersectionPoint.y = diagonalY-1;
-                        System.out.println("illegal right and up move "+i);
-
+//                        System.out.println("illegal right and up move "+i);
                     }
                     diagonalY--;
                 }
@@ -239,6 +235,42 @@ public class Rules {
     private boolean isEnemy(int srcX, int srcY, int destX, int destY){
         return board.getBoard().get(srcY).get(srcX).getColor()!=board.getBoard().get(destY).get(destX).getColor();
     }
+
+    public Color kingIsInCheck(int destX, int destY){
+        if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
+             return board.getBoard().get(destY).get(destX).getColor();
+        }
+        return board.emptyPiece.getColor();
+    }
+
+    public boolean pawnPromotion(int srcX,int srcY,int destX,int destY,Piece piece){
+        if (piece.getPieceType()==PieceType.PAWN){
+            if (piece.getColor()==Color.WHITE&&destY==0){
+                board.getBoard().get(destY).set(destX,new Piece(Color.WHITE,PieceType.QUEEN,1));//white queen
+                return true;
+            }
+            if (piece.getColor()==Color.BLACK&&destY==7){
+                board.getBoard().get(destY).set(destX,new Piece(Color.BLACK,PieceType.QUEEN,7));//black queen
+                board.getBoard().get(srcY).set(srcX,board.emptyPiece);
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean isCastlingMove(int srcX, int srcY, int destX, int destY,Piece piece){
+        if (board.getBoard().get(srcY).get(srcX).firstMove&&board.getBoard().get(destY).get(destX).firstMove){//dest peice is first move
+            if (destPieceIsSameColor(destX,destY,piece)){//same color
+                if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.ROOK){
+                    if (intersection(srcX, srcY, destX, destY) == null||board.getBoard().get(intersectionPoint.y).get(intersectionPoint.x).getPieceType()==PieceType.ROOK){
+                        System.out.println("castlin legal");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
 
 }

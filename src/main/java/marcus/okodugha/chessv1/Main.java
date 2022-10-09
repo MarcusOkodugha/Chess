@@ -1,6 +1,7 @@
 package marcus.okodugha.chessv1;
 
 import marcus.okodugha.chessv1.Model.*;
+import marcus.okodugha.chessv1.Model.Infinity.Infinity;
 import marcus.okodugha.chessv1.View.BoardView;
 
 import java.io.IOException;
@@ -14,12 +15,18 @@ public class Main {
 
         Board board = new Board();//one instance
         Rules rules = new Rules(board);//can be multiple instance
-//        Rules2 rules2 = new Rules2(board);//can be multiple instance todo remove
+//        Infinity infinity = new Infinity(board,Color.WHITE);
+//        Infinity infinity2 = new Infinity(board,Color.BLACK);
         BoardView boardView = new BoardView(board,rules);//one instance
-        GameLoop gameLoop = new GameLoop(board,boardView);
+
+//        GameState gameState = new GameState(board);
+//        gameState.initGameStateList();
 
 
-//        board.movePiece(0,0,3,3);
-//        board.showBoardInTerminal();
+
+
+
+
+//        board.showBoardInTerminal(gameState.gameStateList.get(0));
     }
 }

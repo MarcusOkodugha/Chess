@@ -1,12 +1,11 @@
 package marcus.okodugha.chessv1.View;
 
+import javafx.scene.layout.Pane;
 import marcus.okodugha.chessv1.Model.*;
+import marcus.okodugha.chessv1.Model.Infinity.Infinity;
 
-//import java.awt.event.MouseEvent;
 import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,30 +18,35 @@ import javax.swing.*;
 import java.awt.*;
 
 public class BoardView  {
-        Board board;
-        boolean flipBlack =false,flipWhite = false;
-        JFrame frame = new JFrame();
-        BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
-        Image imgs[] = new Image[12];
-        Icon imgsIcons[] = new Icon[12];
-        JLabel[][] numberTiles;
-        JPanel panel = new JPanel();
+    Color lightBlueColor = new Color(235, 233,210);
+    Color beige = new Color(75, 115, 153);
+    Board board;
+    Rules rules;
+    Infinity infinity;
+    Infinity infinity2;
+    boolean flipBlack =false,flipWhite = false;
+    JFrame frame = new JFrame();
+    BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
+    Image imgs[] = new Image[12];
+    Icon imgsIcons[] = new Icon[12];
+    JLabel[][] numberTiles;
+    JLabel invicebelLable= new JLabel();
+    JPanel panel = new JPanel();
+    JPanel menuPanel = new JPanel();
+    JButton undoButton = new JButton("Undo");
+    JButton resetButton = new JButton("Reset");
+    JButton infinityButton = new JButton("Infinity");
+    JButton button1 = new JButton("1");
+    JButton button2 = new JButton("2");
+    JButton button3 = new JButton("3");
 
-        JPanel panel1 = new JPanel();
-        JPanel panel2 = new JPanel();
-        JPanel panel3 = new JPanel();
-        JPanel panel4 = new JPanel();
-        JPanel panel5 = new JPanel();
-        int pressCount=0;
-        int srcX=0;
-        int srcY=0;
-        Rules rules;
-        int destRow=0;
-        int destColumn=0;
-        private Piece emptyPiece = new Piece(marcus.okodugha.chessv1.Model.Color.NOCOLOR,PieceType.EMPTY,12);
-        private int biggerSize=30;
 
-    PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+    int srcX=0;
+    int srcY=0;
+
+    private Piece emptyPiece = new Piece(marcus.okodugha.chessv1.Model.Color.NOCOLOR,PieceType.EMPTY,12);
+    private int biggerSize=30;
+
 
 
 
@@ -50,10 +54,14 @@ public class BoardView  {
         this.board = board;
         this.rules = rules;
         initBoardView();
+        this.infinity = infinity;
+        this.infinity2 = infinity2;
+
     }
 
     public void initBoardView() throws IOException {
-        frame.setBounds(10,10,752,752);
+//        frame.setBounds(1020,300,752,752); //todo för stor skärm
+        frame.setBounds(400,0,752,792);
 //        frame.setSize(528,552);
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
@@ -70,23 +78,8 @@ public class BoardView  {
                 ind++;
             }
         }
-        //testing
-        panel1.setBackground(Color.GRAY);
-        panel1.setPreferredSize(new Dimension(100,100));
-        panel2.setBackground(Color.GRAY);
-        panel2.setPreferredSize(new Dimension(100,100));
-        panel3.setBackground(Color.GRAY);
-        panel3.setPreferredSize(new Dimension(100,100));
-        panel4.setBackground(Color.GRAY);
-        panel4.setPreferredSize(new Dimension(100,100));
-        panel5.setBackground(Color.MAGENTA);
-        panel5.setPreferredSize(new Dimension(100,100));
-
-    }
-
-        Color lightBlueColor = new Color(235, 233,210);
-        Color beige = new Color(75, 115, 153);
-    public void showBoard(){
+//        menuPanel.setBackground();
+        menuPanel.setPreferredSize(new Dimension(100,40));
         panel.setLayout(new GridLayout(row,column));
         boolean white = true;
         for (int i = 0; i < 8; i++) {
@@ -100,7 +93,7 @@ public class BoardView  {
                 tile.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
-                    tile.setIcon(icon);
+//                    tile.setIcon(icon);
                 }
                 numberTiles[i][j]=tile;
                 numberTiles[i][j].setOpaque(true);
@@ -109,11 +102,49 @@ public class BoardView  {
             }
             white = !white;
         }
-//        frame.add(panel4,BorderLayout.NORTH);
-//        frame.add(panel2,BorderLayout.EAST);
-//        frame.add(panel1,BorderLayout.SOUTH);
-//        frame.add(panel3,BorderLayout.WEST);
+        Icon icon = new ImageIcon(imgs[1]);
+        invicebelLable.setIcon(icon);
+        invicebelLable.setBounds(0,0,64+biggerSize,64+biggerSize);
+        invicebelLable.setOpaque(true);
+        invicebelLable.setBackground(Color.RED);
 
+        numberTiles[0][0].add(invicebelLable);
+        //menu Panel and buttons
+        menuPanel.add(button1);
+        button1.setPreferredSize(new Dimension(100,30));
+        button1.addActionListener(actionListener);
+
+        menuPanel.add(button2);
+        button2.setPreferredSize(new Dimension(100,30));
+        button2.addActionListener(actionListener);
+
+        menuPanel.add(button3);
+        button3.setPreferredSize(new Dimension(100,30));
+        button3.addActionListener(actionListener);
+
+        menuPanel.add(infinityButton);
+        infinityButton.setPreferredSize(new Dimension(100,30));
+        infinityButton.addActionListener(actionListener);
+
+        menuPanel.add(undoButton);
+        undoButton.setPreferredSize(new Dimension(100,30));
+        undoButton.addActionListener(actionListener);
+
+        menuPanel.add(resetButton);
+        resetButton.setPreferredSize(new Dimension(100,30));
+        resetButton.addActionListener(actionListener);
+
+        JPanel southPanel = new JPanel();
+        southPanel.setPreferredSize(new Dimension(40,40));
+        JPanel westPanel = new JPanel();
+        westPanel.setPreferredSize(new Dimension(40,40));
+        JPanel estPanel = new JPanel();
+        estPanel.setPreferredSize(new Dimension(40,40));
+        //frame
+        frame.add(menuPanel,BorderLayout.SOUTH);
+//        frame.add(estPanel,BorderLayout.EAST);
+//        frame.add(westPanel,BorderLayout.WEST);
+//        frame.add(southPanel,BorderLayout.SOUTH);
         frame.add(panel,BorderLayout.CENTER); //add gridview
         frame.addMouseMotionListener(mouseMotionListener);
         frame.addMouseListener(mouseListener);
@@ -124,7 +155,6 @@ public class BoardView  {
 
     public void show(){
         boolean white = true;
-
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (white) {
@@ -141,27 +171,51 @@ public class BoardView  {
                 white = !white;
             }
             white = !white;
-
         }
-
     }
-        Icon holdingPieceIcon = null;
 
-        MouseMotionListener mouseMotionListener = new MouseMotionListener() {
+    ActionListener actionListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource()==undoButton){
+                board.undoMove();
+                show();
+            }
+            if (e.getSource()==resetButton){
+                board.resetBoard();
+                show();
+            }
+            if (e.getSource()==infinityButton){
+                infinity.makeCalculatedMove();
+                show();
+            }
+            if (e.getSource()==button1){
+
+                show();
+            }
+            if (e.getSource()==button2){
+                infinity2.makeCalculatedMove();
+                show();
+            }
+            if (e.getSource()==button3){
+                show();
+            }
+        }
+    };
+
+    Icon holdingPieceIcon = null;
+    MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
-
             currentTime++;
             if (lastTime+5<currentTime){
                 panel.repaint();
                 if (holdingPieceIcon!=null){
-
                     paintOnMouse(holdingPieceIcon,e);
                 }
                 lastTime=currentTime;
             }
             if (holdingPieceIcon!=null){
-
                 paintOnMouse(holdingPieceIcon,e);
             }
         }
@@ -177,7 +231,7 @@ public class BoardView  {
         public void mouseClicked(MouseEvent e) {
 
             if (activPoint.x!=-1&&activPoint.y!=-1){//second click
-                System.out.println("second click");
+//                System.out.println("second click");
                 board.movePiece(activPoint.x,activPoint.y,e.getX()/(64+biggerSize),e.getY()/(64+biggerSize));
                 board.legalMoves.clear();
                 show();
@@ -185,11 +239,9 @@ public class BoardView  {
                 activPoint.y=-1;
             }
             if (activPoint.x==-1&&activPoint.y==-1){//first click
-                System.out.println("first click");
-
+//                System.out.println("first click");
                 srcX=e.getX()/(64+biggerSize);
                 srcY=e.getY()/(64+biggerSize);
-
                 show();
                 showLegalMoves(e);
                 activPoint.x=srcX;
@@ -198,7 +250,7 @@ public class BoardView  {
         }
         @Override
             public void mousePressed(MouseEvent e) {
-            System.out.println("mouse pressed");
+//            System.out.println("mouse pressed");
             srcX=e.getX()/(64+biggerSize);
             srcY=e.getY()/(64+biggerSize);
 //            System.out.println("mouse pressed on tile x = "+srcX+" y= "+srcY);
@@ -233,7 +285,8 @@ public class BoardView  {
     static int currentTime=0;
     static int lastTime=0;
     private void paintOnMouse(Icon icon, MouseEvent e){
-        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+//        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+        invicebelLable.setBounds(e.getX(),e.getY(),64+biggerSize,64+biggerSize);
     }
 
     private void showLegalMoves(MouseEvent e){
