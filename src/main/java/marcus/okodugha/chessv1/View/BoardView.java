@@ -30,7 +30,7 @@ public class BoardView  {
     Image imgs[] = new Image[12];
     Icon imgsIcons[] = new Icon[12];
     JLabel[][] numberTiles;
-    JLabel invicebelLable= new JLabel();
+    JLabel[][] invicebelLables;
     JPanel panel = new JPanel();
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
@@ -65,6 +65,7 @@ public class BoardView  {
 //        frame.setSize(528,552);
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
+        invicebelLables=new JLabel[row][column];
 
         int ind = 0;
         for (int i = 0; i < 400; i += 200) {
@@ -85,30 +86,32 @@ public class BoardView  {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 JLabel tile = new JLabel();
+                JLabel invicebelLabel = new JLabel();
                 if (white) {
                     tile.setBackground(beige);
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
                 tile.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
+                invicebelLabel.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
+                    invicebelLabel.setIcon(icon);
+                    invicebelLabel.setBackground(Color.RED);
 //                    tile.setIcon(icon);
                 }
+                invicebelLables[i][j]=invicebelLabel;
                 numberTiles[i][j]=tile;
+                invicebelLables[i][j].setOpaque(true);
+                panel.add(invicebelLables[i][j]);
                 numberTiles[i][j].setOpaque(true);
                 panel.add(numberTiles[i][j]);
                 white = !white;
             }
             white = !white;
         }
-        Icon icon = new ImageIcon(imgs[1]);
-        invicebelLable.setIcon(icon);
-        invicebelLable.setBounds(0,0,64+biggerSize,64+biggerSize);
-        invicebelLable.setOpaque(true);
-        invicebelLable.setBackground(Color.RED);
 
-        numberTiles[0][0].add(invicebelLable);
+
         //menu Panel and buttons
         menuPanel.add(button1);
         button1.setPreferredSize(new Dimension(100,30));
@@ -163,10 +166,14 @@ public class BoardView  {
                     numberTiles[i][j].setBackground(lightBlueColor);
                 }
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
-                    numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+
+//                    numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+                    invicebelLables[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+//                    invicebelLables[i][j].setBackground(Color.RED);//todo remove
                 }
                 if (board.getBoard().get(i).get(j).getImageIndex() == 12){
-                    numberTiles[i][j].setIcon(null);
+//                    numberTiles[i][j].setIcon(null);
+                    invicebelLables[i][j].setIcon(null);
                 }
                 white = !white;
             }
@@ -174,36 +181,27 @@ public class BoardView  {
         }
     }
 
-    ActionListener actionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource()==undoButton){
-                board.undoMove();
-                show();
-            }
-            if (e.getSource()==resetButton){
-                board.resetBoard();
-                show();
-            }
-            if (e.getSource()==infinityButton){
-                infinity.makeCalculatedMove();
-                show();
-            }
-            if (e.getSource()==button1){
 
-                show();
+    private void showLegalMoves(MouseEvent e){
+        int k=0;
+        for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
+            panel.repaint();
+            if (holdingPieceIcon!=null){
+
+                paintOnMouse(holdingPieceIcon,e);
             }
-            if (e.getSource()==button2){
-                infinity2.makeCalculatedMove();
-                show();
+            if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
+                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
+            }else {
+                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
             }
-            if (e.getSource()==button3){
-                show();
-            }
+            k++;
         }
-    };
+        board.legalMoves.clear();
+    }
 
     Icon holdingPieceIcon = null;
+    Point pressPoint = new Point(-1,-1);
     MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
@@ -256,6 +254,7 @@ public class BoardView  {
 //            System.out.println("mouse pressed on tile x = "+srcX+" y= "+srcY);
             if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
+                    pressPoint = new Point(srcX,srcY);
             }
             // show legalMoves
             show();
@@ -265,6 +264,7 @@ public class BoardView  {
         @Override
         public void mouseReleased(MouseEvent e) {
             holdingPieceIcon=null;//reset holdigPieceIcon when mouse is released
+            pressPoint=null;
             if (srcX==e.getX()/(64+biggerSize)&&srcY==e.getY()/(64+biggerSize)){//keeps showing legalmoves if mouse is released on srcX srcY
             showLegalMoves(e);
             }else {
@@ -286,28 +286,39 @@ public class BoardView  {
     static int lastTime=0;
     private void paintOnMouse(Icon icon, MouseEvent e){
 //        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
-        invicebelLable.setBounds(e.getX(),e.getY(),64+biggerSize,64+biggerSize);
+        invicebelLables[pressPoint.x][pressPoint.y].setBounds(e.getX(),e.getY(),64+biggerSize,64+biggerSize);
+
     }
 
-    private void showLegalMoves(MouseEvent e){
-        int k=0;
-        for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
-            panel.repaint();
-            if (holdingPieceIcon!=null){
 
-                paintOnMouse(holdingPieceIcon,e);
+    ActionListener actionListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource()==undoButton){
+                board.undoMove();
+                show();
             }
-            if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
-                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
-            }else {
-                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
+            if (e.getSource()==resetButton){
+                board.resetBoard();
+                show();
             }
-            k++;
+            if (e.getSource()==infinityButton){
+                infinity.makeCalculatedMove();
+                show();
+            }
+            if (e.getSource()==button1){
+
+                show();
+            }
+            if (e.getSource()==button2){
+                infinity2.makeCalculatedMove();
+                show();
+            }
+            if (e.getSource()==button3){
+                show();
+            }
         }
-        board.legalMoves.clear();
-    }
-
-
+    };
 
 
 }
