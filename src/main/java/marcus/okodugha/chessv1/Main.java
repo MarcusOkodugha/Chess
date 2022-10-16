@@ -14,7 +14,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         Board board = new Board();//one instance
-        Rules rules = new Rules(board);//can be multiple instance
+//        Rules rules = new Rules(board);//can be multiple instance
 //        Infinity infinity = new Infinity(board,Color.WHITE);
 //        Infinity infinity2 = new Infinity(board,Color.BLACK);
         BoardView boardView = new BoardView(board);//one instance

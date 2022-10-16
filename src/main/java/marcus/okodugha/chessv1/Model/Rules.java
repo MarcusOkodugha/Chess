@@ -3,11 +3,11 @@ package marcus.okodugha.chessv1.Model;
 import java.awt.*;
 
 public class Rules {
-//    private Board board;
+    private Board board;
     private Point intersectionPoint = new Point();
 
     public Rules(Board board) {
-//        this.board = board;
+        this.board = board;
 //        legalMoves.add(new Point(4,7));
 
     }
@@ -228,15 +228,15 @@ public class Rules {
     }
     public Color kingIsInCheck(int destX, int destY){
         if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
-            System.out.println(board.getBoard().get(destY).get(destX) +"king is in check");
+//            System.out.println(board.getBoard().get(destY).get(destX) +"king is in check");
              return board.getBoard().get(destY).get(destX).getColor();
         }
         return board.emptyPiece.getColor();
     }
 
-    public boolean yourKingWillBeInCheck(){
-
-    }
+//    private boolean yourKingWillBeInCheck(){
+//
+//    }
     public boolean pawnPromotion(int srcX,int srcY,int destX,int destY,Piece piece){
         if (piece.getPieceType()==PieceType.PAWN){
             if (piece.getColor()==Color.WHITE&&destY==0){
@@ -256,7 +256,7 @@ public class Rules {
             if (destPieceIsSameColor(destX,destY,piece)){//same color
                 if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.ROOK){
                     if (intersection(srcX, srcY, destX, destY) == null||board.getBoard().get(intersectionPoint.y).get(intersectionPoint.x).getPieceType()==PieceType.ROOK){
-                        System.out.println("castlin legal");
+//                        System.out.println("castlin legal");
                         return true;
                     }
                 }

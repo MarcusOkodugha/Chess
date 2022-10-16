@@ -223,7 +223,7 @@ public class BoardView  {
 
             if (activPoint.x!=-1&&activPoint.y!=-1){//second click
 //                System.out.println("second click");
-                board.movePiece(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize);
+                board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
                 board.legalMoves.clear();
                 show();
                 activPoint.x=-1;
@@ -260,7 +260,7 @@ public class BoardView  {
             if (srcX==e.getX()/blockSize&&srcY==e.getY()/blockSize){//keeps showing legalmoves if mouse is released on srcX srcY
             showLegalMoves(e);
             }else {
-                board.movePiece(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize);
+                board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize));
                 panel.repaint();
                 show();
             }

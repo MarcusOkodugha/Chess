@@ -47,7 +47,7 @@ public class Infinity {
         int r = random.nextInt(allLegalAiMoves.size()) ;
         System.out.println(r);
         System.out.println("black has "+allLegalAiMoves.size()+" legal moves ");
-        board.movePiece(allLegalAiMoves.get(r).srcX,allLegalAiMoves.get(r).srcY,allLegalAiMoves.get(r).destX,allLegalAiMoves.get(r).destY);
+        board.movePiece(allLegalAiMoves.get(r));
         System.out.println("infinity tride to make a move");
         nrOfBlackMoves++;
     }
@@ -68,14 +68,12 @@ public class Infinity {
             }
         }
 
-        board.movePiece(bestMove.srcX,bestMove.srcY,bestMove.destX,bestMove.destY);
+        board.movePiece(bestMove);
     }
 
 
 
     public void playOpeningThenCalculatedMoves(){
-
-
         if (nrOfBlackMoves<8&&rules.isLegalMove(opening.getOpeningMove(nrOfBlackMoves))){
             bestMove=opening.getOpeningMove(nrOfBlackMoves);
         }else {bestMove=null;}
@@ -98,7 +96,7 @@ public class Infinity {
 
 
         nrOfBlackMoves++;
-        board.movePiece(bestMove.srcX,bestMove.srcY,bestMove.destX,bestMove.destY);
+        board.movePiece(bestMove);
         bestMove=null;
     }
 

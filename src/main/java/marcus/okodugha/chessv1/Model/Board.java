@@ -10,7 +10,7 @@ public class Board {
     public static final int row = 8;
     public Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
     public ArrayList<Point> legalMoves = new ArrayList<Point>();
-    public ArrayList<Point> allLegalMoves = new ArrayList<Point>();
+    public ArrayList<Move> allLegalMoves = new ArrayList<Move>();
     public ArrayList<Move> allLegalBlackMoves = new ArrayList<Move>();
     public ArrayList<Move> allLegalWhiteMoves = new ArrayList<Move>();
 
@@ -19,18 +19,20 @@ public class Board {
     Infinity infinity2;
     private ArrayList<ArrayList<Piece>> board;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
-
+    private final int maxGameStates=300;
     private Rules rules;
     int nrOfMoves=0;
     public boolean whiteKingIsInCheck;
     public boolean blackKingIsInCheck;
+    public boolean whiteKingIsInCheck2;
+    public boolean blackKingIsInCheck2;
     private boolean gamIsRunning=true;
 
     public Board() {
         board= new ArrayList<>();
         this.rules = new Rules(this);
         initBoard(board);
-        for (int i = 0; i < 270; i++) {
+        for (int i = 0; i < maxGameStates; i++) {
             gameStateList2.add(new ArrayList<>());
             initBoard(gameStateList2.get(i));
         }
@@ -39,18 +41,20 @@ public class Board {
         this.infinity2 = new Infinity(this,Color.BLACK);
     }
 
-    public ArrayList<Point> getLegalMoves(int srcX,int srcY,Piece piece) {
+    public ArrayList<Point> getLegalMoves(int srcX,int srcY,Piece piece){
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 if (rules.isLegalMove(srcX,srcY,j,i,board.get(srcY).get(srcX))){
-                    legalMoves.add(new Point(j,i));
+                    if (listContainsMove(allLegalMoves,new Move(srcX,srcY,j,i))){
+                        legalMoves.add(new Point(j,i));
+                    }
                 }
             }
         }
         return legalMoves;
     }
 
-    public ArrayList<Point> getAllLegalMoves() {
+    public ArrayList<Move> getAllLegalMoves(){
         whiteKingIsInCheck=false;
         blackKingIsInCheck=false;
         allLegalMoves.clear();
@@ -65,13 +69,15 @@ public class Board {
                                 if (rules.kingIsInCheck(l,k)==Color.WHITE)whiteKingIsInCheck=true;
                                 if (rules.kingIsInCheck(l,k)==Color.BLACK)blackKingIsInCheck=true;
                             }
-                            allLegalMoves.add(new Point(l,k));
+                            if (quickMove(new Move(j,i,l,k))){
+                                allLegalMoves.add(new Move(j,i,l,k));
 
-                            if (board.get(i).get(j).getColor()==Color.WHITE){
-                                allLegalWhiteMoves.add(new Move(j,i,l,k));
-                            }
-                            if (board.get(i).get(j).getColor()==Color.BLACK){
-                                allLegalBlackMoves.add(new Move(j,i,l,k));
+                                if (board.get(i).get(j).getColor()==Color.WHITE){
+                                    allLegalWhiteMoves.add(new Move(j,i,l,k));
+                                }
+                                if (board.get(i).get(j).getColor()==Color.BLACK){
+                                    allLegalBlackMoves.add(new Move(j,i,l,k));
+                                }
                             }
                         }
                     }
@@ -81,13 +87,71 @@ public class Board {
         return allLegalMoves;
     }
 
+    public boolean listContainsMove(ArrayList<Move> list, Move move){
+        for (Move m:list) {
+            if (m.srcX==move.srcX&&m.srcY==move.srcY&&m.destX==move.destX&&m.destY==move.destY){
+                return true;
+            }
+        }
+        return false;
+    }
 
+    public void getAllLegalMoves2(){
+        whiteKingIsInCheck2=false;
+        blackKingIsInCheck2=false;
 
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                for (int k = 0; k < row; k++) {
+                    for (int l = 0; l < column; l++) {
+                        if (rules.isLegalMove(j,i,l,k,board.get(i).get(j))){
+                            if (rules.kingIsInCheck(l,k)!=emptyPiece.getColor()){
+                                if (rules.kingIsInCheck(l,k)==Color.WHITE)whiteKingIsInCheck2=true;
+                                if (rules.kingIsInCheck(l,k)==Color.BLACK)blackKingIsInCheck2=true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-    public void movePiece(int srcX, int srcY, int destX, int destY){
+    public boolean quickMove(Move move){
+        int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
+        Piece srcPiece; Piece destPiece; srcPiece=board.get(srcY).get(srcX); destPiece=board.get(destY).get(destX);
 
-        copyBoard(getBoard(),boardAfterMove);//todo implement
-        makeAFutureMove(new Move(srcX,srcY,destX,destY));
+        handelMoveType(srcX, srcY, destX, destY);
+
+        getAllLegalMoves2();
+
+        revertMove(srcX, srcY, destX, destY, srcPiece, destPiece);
+
+        if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&whiteKingIsInCheck2||board.get(srcY).get(srcX).getColor()==Color.BLACK&&blackKingIsInCheck2){
+//            System.out.println("move is not your legal king will be in check");
+            return false;
+        }
+        return true;
+    }
+
+    private void revertMove(int srcX, int srcY, int destX, int destY, Piece srcPiece, Piece destPiece) {
+        if (rules.destPieceIsSameColor(destX, destY,board.get(srcY).get(srcX))){
+            board.get(destY).set(destX, destPiece);
+            board.get(srcY).set(srcX, srcPiece);
+            if (srcX < destX){//move is to the right
+                board.get(destY).set(destX -1,emptyPiece);//king
+                board.get(destY).set(destX -2,emptyPiece);//rook
+            }
+            if (destX < srcX){//move is to the left
+                board.get(destY).set(destX +2,emptyPiece);//king
+                board.get(destY).set(destX +3,emptyPiece);//rook
+            }
+        }
+        board.get(destY).set(destX, destPiece);
+        board.get(srcY).set(srcX, srcPiece);
+    }
+
+    public void movePiece(Move move){
+        int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
 
         if (!gamIsRunning)return;
 
@@ -105,49 +169,29 @@ public class Board {
             return;
         }
 
+        if (!listContainsMove(allLegalMoves,move)){
+            System.out.println("list did not contain move move therfore not legal");
+            return;
+        }
+
         board.get(srcY).get(srcX).setFirstMove(false);
-        //castling
-        if (rules.destPieceIsSameColor(destX,destY,board.get(srcY).get(srcX))){
-            if (srcX<destX){//move is to the right
-                board.get(destY).set(destX-1,board.get(srcY).get(srcX));//king
-                board.get(destY).set(destX-2,board.get(srcY).get(destX));//rook
-                board.get(srcY).set(srcX,emptyPiece);
-                board.get(srcY).set(destX,emptyPiece);
-                System.out.println("rokad commplet");
-            }
-            if (destX<srcX){//move is to the left
-                board.get(destY).set(destX+2,board.get(srcY).get(srcX));//king
-                board.get(destY).set(destX+3,board.get(srcY).get(destX));//rook
-                board.get(srcY).set(srcX,emptyPiece);
-                board.get(srcY).set(destX,emptyPiece);
-                System.out.println("rokad commplet");
-            }
-        }
 
-        if (rules.pawnPromotion(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
-            board.get(srcY).set(srcX,emptyPiece);
+        handelMoveType(srcX, srcY, destX, destY);
 
-        } else {//normal move
-                board.get(destY).set(destX,board.get(srcY).get(srcX));
-                board.get(srcY).set(srcX,emptyPiece);
-        }
-        //every legal move
         nrOfMoves++;
         copyAndAdd(board);
         getAllLegalMoves();
 
-//        if (isWhiteTurn()){
-////            getAllLegalMoves();
-//            infinity.updateAllLegalAiMoves();
-////            getAllLegalMovesForBlack();
-//            if (allLegalWhiteMoves.size() == 0){
-//                System.out.println("no legal White moves Black Wins!!!!");
-//                gamIsRunning=false;
-//                return;
-//            }
-////            infinity.makeRetardedMove();
-//            infinity.makeCalculatedMove();
-//        }
+        if (isWhiteTurn()){
+            infinity.updateAllLegalAiMoves();
+            if (allLegalWhiteMoves.size() == 0){
+                System.out.println("no legal White moves Black Wins!!!!");
+                gamIsRunning=false;
+                return;
+            }
+//            infinity.makeRetardedMove();
+            infinity.makeCalculatedMove();
+        }
 
         if (!isWhiteTurn()){
             infinity2.updateAllLegalAiMoves();
@@ -160,12 +204,45 @@ public class Board {
             infinity2.playOpeningThenCalculatedMoves();
         }
 
-        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){
-//            System.out.println("cant move white king is in check!");
-            undoMove();
+//        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){//todo remove
+//            System.out.println("cant move king is in check!");
+////            undoMove();
+//        }
+    }
+
+    private void handelMoveType(int srcX, int srcY, int destX, int destY) {
+        if (rules.destPieceIsSameColor(destX,destY,board.get(srcY).get(srcX))){
+            if (srcX<destX){//move is to the right
+                board.get(destY).set(destX-1,board.get(srcY).get(srcX));//king
+                board.get(destY).set(destX-2,board.get(srcY).get(destX));//rook
+                board.get(srcY).set(srcX,emptyPiece);
+                board.get(srcY).set(destX,emptyPiece);
+            }
+            if (destX<srcX){//move is to the left
+                board.get(destY).set(destX+2,board.get(srcY).get(srcX));//king
+                board.get(destY).set(destX+3,board.get(srcY).get(destX));//rook
+                board.get(srcY).set(srcX,emptyPiece);
+                board.get(srcY).set(destX,emptyPiece);
+            }
+        }
+
+        if (rules.pawnPromotion(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
+            board.get(srcY).set(srcX,emptyPiece);
+
+        } else {//normal move
+                board.get(destY).set(destX,board.get(srcY).get(srcX));
+                board.get(srcY).set(srcX,emptyPiece);
         }
     }
+
     public void copyAndAdd(ArrayList<ArrayList<Piece>> inBoard){
+
+        if (nrOfMoves==maxGameStates){
+            System.out.println("stopped playing due to max move limit");
+            gamIsRunning =false;
+            return;
+        }
+
         Piece [][] piece = new Piece [row][column];
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
@@ -182,7 +259,7 @@ public class Board {
             }
         }
         System.out.println("copy board done");
-        show2DListInTerminal(tooBoard);
+//        show2DListInTerminal(tooBoard);
     }
     public void undoMove(){
         gamIsRunning =true;
@@ -278,61 +355,5 @@ public class Board {
     public ArrayList<ArrayList<Piece>> getBoard() {
         return board;
     }
-    private void makeAFutureMove(Move move){
-        int srcX= move.srcX;
-        int srcY= move.srcY;
-        int destX= move.destX;
-        int destY= move.destY;
 
-        if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&!isWhiteTurn()){
-            System.out.println("not whites turn");
-            return;
-        }
-        if (board.get(srcY).get(srcX).getColor()==Color.BLACK&&isWhiteTurn()){
-            System.out.println("not blacks turn");
-            return;
-        }
-
-        if (!rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){//move not legal
-            System.out.println("move not legal");
-            return;
-        }
-
-        board.get(srcY).get(srcX).setFirstMove(false);
-        //castling
-        if (rules.destPieceIsSameColor(destX,destY,board.get(srcY).get(srcX))){
-            if (srcX<destX){//move is to the right
-                board.get(destY).set(destX-1,board.get(srcY).get(srcX));//king
-                board.get(destY).set(destX-2,board.get(srcY).get(destX));//rook
-                board.get(srcY).set(srcX,emptyPiece);
-                board.get(srcY).set(destX,emptyPiece);
-                System.out.println("rokad commplet");
-            }
-            if (destX<srcX){//move is to the left
-                board.get(destY).set(destX+2,board.get(srcY).get(srcX));//king
-                board.get(destY).set(destX+3,board.get(srcY).get(destX));//rook
-                board.get(srcY).set(srcX,emptyPiece);
-                board.get(srcY).set(destX,emptyPiece);
-                System.out.println("rokad commplet");
-            }
-        }
-
-        if (rules.pawnPromotion(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
-            board.get(srcY).set(srcX,emptyPiece);
-
-        } else {//normal move
-            board.get(destY).set(destX,board.get(srcY).get(srcX));
-            board.get(srcY).set(srcX,emptyPiece);
-        }
-        //every legal move
-        nrOfMoves++;
-
-        getAllLegalMoves();
-
-
-        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){
-//            System.out.println("cant move white king is in check!");
-            undoMove();
-        }
-    }
 }
