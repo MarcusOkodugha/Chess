@@ -1,27 +1,21 @@
 package marcus.okodugha.chessv1.View;
-
-import javafx.scene.layout.Pane;
 import marcus.okodugha.chessv1.Model.*;
 import marcus.okodugha.chessv1.Model.Infinity.Infinity;
-
 import java.awt.Color;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
-import static marcus.okodugha.chessv1.Model.Board.column;
-import static marcus.okodugha.chessv1.Model.Board.row;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import static marcus.okodugha.chessv1.Model.Board.column;
+import static marcus.okodugha.chessv1.Model.Board.row;
 
 public class BoardView  {
     Color lightBlueColor = new Color(235, 233,210);
     Color beige = new Color(75, 115, 153);
     Board board;
-    Rules rules;
     Infinity infinity;
     Infinity infinity2;
     boolean flipBlack =false,flipWhite = false;
@@ -32,6 +26,8 @@ public class BoardView  {
     JLabel[][] numberTiles;
     JLabel[][] invicebelLables;
     JPanel panel = new JPanel();
+//    JLayeredPane panel = new JLayeredPane();
+
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
     JButton resetButton = new JButton("Reset");
@@ -40,19 +36,15 @@ public class BoardView  {
     JButton button2 = new JButton("2");
     JButton button3 = new JButton("3");
 
-
     int srcX=0;
     int srcY=0;
-
-    private Piece emptyPiece = new Piece(marcus.okodugha.chessv1.Model.Color.NOCOLOR,PieceType.EMPTY,12);
-    private int biggerSize=30;
+    private final int blockSize =94;
 
 
 
 
-    public BoardView(Board board, Rules rules) throws IOException {
+    public BoardView(Board board) throws IOException {
         this.board = board;
-        this.rules = rules;
         initBoardView();
         this.infinity = infinity;
         this.infinity2 = infinity2;
@@ -70,12 +62,8 @@ public class BoardView  {
         int ind = 0;
         for (int i = 0; i < 400; i += 200) {
             for (int j = 0; j < 1200; j += 200) {
-                imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance(64+biggerSize, 64+biggerSize, BufferedImage.SCALE_SMOOTH);
-                if (ind==4){
-                }else {
-
-                }
-                    imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(64+biggerSize, 64+biggerSize, BufferedImage.SCALE_SMOOTH));
+                imgs[ind] = all.getSubimage(j, i, 200, 200).getScaledInstance( blockSize, blockSize, BufferedImage.SCALE_SMOOTH);
+                imgsIcons[ind] = new ImageIcon(all.getSubimage(j, i, 200, 200).getScaledInstance(blockSize,blockSize, BufferedImage.SCALE_SMOOTH));
                 ind++;
             }
         }
@@ -92,20 +80,24 @@ public class BoardView  {
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
-                tile.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
-                invicebelLabel.setBounds(i*64+biggerSize,j*64+biggerSize,64+biggerSize,64+biggerSize);
+                tile.setBounds(i*blockSize,j*blockSize,blockSize,blockSize);
+//                invicebelLabel.setBounds(i*biggerSize,j*biggerSize,biggerSize,biggerSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
-                    invicebelLabel.setIcon(icon);
-                    invicebelLabel.setBackground(Color.RED);
-//                    tile.setIcon(icon);
+//                    invicebelLabel.setIcon(icon);
+//                    invicebelLabel.setBackground(Color.RED);
+                    tile.setIcon(icon);
                 }
-                invicebelLables[i][j]=invicebelLabel;
                 numberTiles[i][j]=tile;
-                invicebelLables[i][j].setOpaque(true);
-                panel.add(invicebelLables[i][j]);
                 numberTiles[i][j].setOpaque(true);
+//                panel.setLayer(numberTiles[i][j],JLayeredPane.DEFAULT_LAYER);
                 panel.add(numberTiles[i][j]);
+
+//                invicebelLables[i][j]=invicebelLabel;
+//                invicebelLables[i][j].setOpaque(true);
+//                panel.setLayer(invicebelLables[i][j],1);
+//                panel.add(invicebelLables[i][j],2,0);
+
                 white = !white;
             }
             white = !white;
@@ -167,13 +159,13 @@ public class BoardView  {
                 }
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
 
-//                    numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
-                    invicebelLables[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+                    numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
+//                    invicebelLables[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
 //                    invicebelLables[i][j].setBackground(Color.RED);//todo remove
                 }
                 if (board.getBoard().get(i).get(j).getImageIndex() == 12){
-//                    numberTiles[i][j].setIcon(null);
-                    invicebelLables[i][j].setIcon(null);
+                    numberTiles[i][j].setIcon(null);
+//                    invicebelLables[i][j].setIcon(null);
                 }
                 white = !white;
             }
@@ -184,6 +176,7 @@ public class BoardView  {
 
     private void showLegalMoves(MouseEvent e){
         int k=0;
+
         for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
             panel.repaint();
             if (holdingPieceIcon!=null){
@@ -230,7 +223,7 @@ public class BoardView  {
 
             if (activPoint.x!=-1&&activPoint.y!=-1){//second click
 //                System.out.println("second click");
-                board.movePiece(activPoint.x,activPoint.y,e.getX()/(64+biggerSize),e.getY()/(64+biggerSize));
+                board.movePiece(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize);
                 board.legalMoves.clear();
                 show();
                 activPoint.x=-1;
@@ -238,8 +231,8 @@ public class BoardView  {
             }
             if (activPoint.x==-1&&activPoint.y==-1){//first click
 //                System.out.println("first click");
-                srcX=e.getX()/(64+biggerSize);
-                srcY=e.getY()/(64+biggerSize);
+                srcX=e.getX()/blockSize;
+                srcY=e.getY()/blockSize;
                 show();
                 showLegalMoves(e);
                 activPoint.x=srcX;
@@ -248,9 +241,8 @@ public class BoardView  {
         }
         @Override
             public void mousePressed(MouseEvent e) {
-//            System.out.println("mouse pressed");
-            srcX=e.getX()/(64+biggerSize);
-            srcY=e.getY()/(64+biggerSize);
+            srcX=e.getX()/blockSize;
+            srcY=e.getY()/blockSize;
 //            System.out.println("mouse pressed on tile x = "+srcX+" y= "+srcY);
             if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
@@ -265,10 +257,10 @@ public class BoardView  {
         public void mouseReleased(MouseEvent e) {
             holdingPieceIcon=null;//reset holdigPieceIcon when mouse is released
             pressPoint=null;
-            if (srcX==e.getX()/(64+biggerSize)&&srcY==e.getY()/(64+biggerSize)){//keeps showing legalmoves if mouse is released on srcX srcY
+            if (srcX==e.getX()/blockSize&&srcY==e.getY()/blockSize){//keeps showing legalmoves if mouse is released on srcX srcY
             showLegalMoves(e);
             }else {
-                board.movePiece(srcX,srcY,e.getX()/(64+biggerSize),e.getY()/(64+biggerSize));
+                board.movePiece(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize);
                 panel.repaint();
                 show();
             }
@@ -280,13 +272,13 @@ public class BoardView  {
         public void mouseExited(MouseEvent e) {
         }
     };
-    int xMouseOffset =32+(biggerSize/2);
-    int yMouseOffset=32+(biggerSize/2);
+    int xMouseOffset =blockSize/2;
+    int yMouseOffset=blockSize/2;
     static int currentTime=0;
     static int lastTime=0;
     private void paintOnMouse(Icon icon, MouseEvent e){
-//        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
-        invicebelLables[pressPoint.x][pressPoint.y].setBounds(e.getX(),e.getY(),64+biggerSize,64+biggerSize);
+        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+//        invicebelLables[pressPoint.x][pressPoint.y].setBounds(e.getX(),e.getY(),biggerSize,biggerSize);
 
     }
 

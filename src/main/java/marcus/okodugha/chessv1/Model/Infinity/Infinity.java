@@ -1,9 +1,7 @@
 package marcus.okodugha.chessv1.Model.Infinity;
 
-import marcus.okodugha.chessv1.Model.Board;
+import marcus.okodugha.chessv1.Model.*;
 import marcus.okodugha.chessv1.Model.Color;
-import marcus.okodugha.chessv1.Model.Move;
-import marcus.okodugha.chessv1.Model.PieceType;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,6 +12,7 @@ import static marcus.okodugha.chessv1.Model.Board.row;
 
 public class Infinity {
     Board board;
+    Rules rules;
     int nrOfBlackMoves;
     Move bestMove=new Move();
     Color color;
@@ -25,6 +24,7 @@ public class Infinity {
     public Infinity(Board board, Color color) {
         this.board = board;
         this.color = color;
+        this.rules= new Rules(board);
         updateAllLegalAiMoves();
     }
 
@@ -76,11 +76,11 @@ public class Infinity {
     public void playOpeningThenCalculatedMoves(){
 
 
-        if (nrOfBlackMoves<8){
+        if (nrOfBlackMoves<8&&rules.isLegalMove(opening.getOpeningMove(nrOfBlackMoves))){
             bestMove=opening.getOpeningMove(nrOfBlackMoves);
-        }
+        }else {bestMove=null;}
+        if (bestMove==null){
 
-        if (nrOfBlackMoves>=8){
             Random random = new Random();
             int r = random.nextInt(allLegalAiMoves.size()) ;
 
@@ -88,17 +88,18 @@ public class Infinity {
 
             for (Move b: allLegalAiMoves) {
                 if (!destPointIsEmpty(new Point(b.destX,b.destY))){
-                    if (board.getBoard().get(b.destY).get(b.destX).getPieceType().ordinal()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().ordinal()){
+                    if (board.getBoard().get(b.destY).get(b.destX).getPieceType().ordinal()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().ordinal()){//kill highest value piece
                         bestMove = new Move(b.srcX,b.srcY,b.destX,b.destY);
                     }
                 }
             }
 
-
         }
+
 
         nrOfBlackMoves++;
         board.movePiece(bestMove.srcX,bestMove.srcY,bestMove.destX,bestMove.destY);
+        bestMove=null;
     }
 
     private boolean destPointIsEmpty(Point point){

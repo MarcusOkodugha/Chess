@@ -3,44 +3,36 @@ package marcus.okodugha.chessv1.Model;
 import java.awt.*;
 
 public class Rules {
-    private Board board;
+//    private Board board;
     private Point intersectionPoint = new Point();
 
     public Rules(Board board) {
-        this.board = board;
+//        this.board = board;
 //        legalMoves.add(new Point(4,7));
 
     }
-    public boolean isLegalMove(int srcX, int srcY, int destX, int destY, Piece piece) {
-        if (piece.getPieceType() == PieceType.PAWN) {
-            if (isPawnMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            if (isBishopMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.ROOK) {
-            if (isRookMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.KING) {
-            if (isKingMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.QUEEN) {
-            if (isQueenMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.KNIGHT) {
-            if (isKnightMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
+
+    public boolean isLegalMove(Move move){
+        return isLegalMove(move.srcX,move.srcY,move.destX,move.destY,board.getBoard().get(move.srcY).get(move.srcX));
+    }
+
+    public boolean isLegalMove(int srcX, int srcY, int destX, int destY, Piece piece){
+
+//        board.copyBoard(board.getBoard(),board.boardAfterMove);//todo maby remvo
+
+        switch (piece.getPieceType()){
+            case PAWN:if (isPawnMoveLegal(srcX, srcY, destX, destY, piece)) return true;
+                break;
+            case BISHOP:if (isBishopMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case ROOK:if (isRookMoveLegal(srcX, srcY, destX, destY, piece)) return true;
+                break;
+            case KING:if (isKingMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case QUEEN:if (isQueenMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case KNIGHT:if (isKnightMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
         }
         return false;
     }
@@ -102,7 +94,6 @@ public class Rules {
             return false;
     }
     //basic rules
-
     private boolean moveIsForward(int srcY, int destY) {
         return srcY > destY;
     }
@@ -235,14 +226,17 @@ public class Rules {
     private boolean isEnemy(int srcX, int srcY, int destX, int destY){
         return board.getBoard().get(srcY).get(srcX).getColor()!=board.getBoard().get(destY).get(destX).getColor();
     }
-
     public Color kingIsInCheck(int destX, int destY){
         if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
+            System.out.println(board.getBoard().get(destY).get(destX) +"king is in check");
              return board.getBoard().get(destY).get(destX).getColor();
         }
         return board.emptyPiece.getColor();
     }
 
+    public boolean yourKingWillBeInCheck(){
+
+    }
     public boolean pawnPromotion(int srcX,int srcY,int destX,int destY,Piece piece){
         if (piece.getPieceType()==PieceType.PAWN){
             if (piece.getColor()==Color.WHITE&&destY==0){

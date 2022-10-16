@@ -17,7 +17,8 @@ public class Main {
         Rules rules = new Rules(board);//can be multiple instance
 //        Infinity infinity = new Infinity(board,Color.WHITE);
 //        Infinity infinity2 = new Infinity(board,Color.BLACK);
-        BoardView boardView = new BoardView(board,rules);//one instance
+        BoardView boardView = new BoardView(board);//one instance
+
 
 //        GameState gameState = new GameState(board);
 //        gameState.initGameStateList();
@@ -27,6 +28,6 @@ public class Main {
 
 
 
-//        board.showBoardInTerminal(gameState.gameStateList.get(0));
+//        board.showBoardInTerminal(board);
     }
 }

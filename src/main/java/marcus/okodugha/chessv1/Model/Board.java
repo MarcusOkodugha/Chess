@@ -4,7 +4,6 @@ import marcus.okodugha.chessv1.Model.Infinity.Infinity;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class Board {
     public static final int column =8;
@@ -12,7 +11,6 @@ public class Board {
     public Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
     public ArrayList<Point> legalMoves = new ArrayList<Point>();
     public ArrayList<Point> allLegalMoves = new ArrayList<Point>();
-//    public ArrayList<Point> allLegalBlackMoves = new ArrayList<Point>();
     public ArrayList<Move> allLegalBlackMoves = new ArrayList<Move>();
     public ArrayList<Move> allLegalWhiteMoves = new ArrayList<Move>();
 
@@ -20,6 +18,7 @@ public class Board {
     Infinity infinity;
     Infinity infinity2;
     private ArrayList<ArrayList<Piece>> board;
+    public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
 
     private Rules rules;
     int nrOfMoves=0;
@@ -84,7 +83,11 @@ public class Board {
 
 
 
+
     public void movePiece(int srcX, int srcY, int destX, int destY){
+
+        copyBoard(getBoard(),boardAfterMove);//todo implement
+        makeAFutureMove(new Move(srcX,srcY,destX,destY));
 
         if (!gamIsRunning)return;
 
@@ -130,10 +133,8 @@ public class Board {
         }
         //every legal move
         nrOfMoves++;
-
         copyAndAdd(board);
         getAllLegalMoves();
-
 
 //        if (isWhiteTurn()){
 ////            getAllLegalMoves();
@@ -164,7 +165,6 @@ public class Board {
             undoMove();
         }
     }
-
     public void copyAndAdd(ArrayList<ArrayList<Piece>> inBoard){
         Piece [][] piece = new Piece [row][column];
         for (int i = 0; i < row; i++) {
@@ -175,7 +175,15 @@ public class Board {
             }
         }
     }
-
+    public void copyBoard(ArrayList<ArrayList<Piece>> fromBoard,ArrayList<ArrayList<Piece>> tooBoard){
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                tooBoard.get(i).set(i,fromBoard.get(i).get(j));
+            }
+        }
+        System.out.println("copy board done");
+        show2DListInTerminal(tooBoard);
+    }
     public void undoMove(){
         gamIsRunning =true;
         if (nrOfMoves<=0){
@@ -201,12 +209,19 @@ public class Board {
         }
         System.out.println("game reset");
     }
-
     private boolean isWhiteTurn(){
         return nrOfMoves%2==0;
     }
-
     private void initBoard(ArrayList<ArrayList<Piece>> board){
+        for (int i = 0; i < row; i++) {//init boardAftermove
+            boardAfterMove.add(new ArrayList<Piece>());
+        }
+        for (int i = 0; i <row ; i++) {
+            for (int j = 0; j <column; j++) {
+                boardAfterMove.get(j).add(new Piece(Color.NOCOLOR,PieceType.EMPTY,12));
+            }
+        }
+        //add arraylists to board
         for (int i = 0; i < row; i++) {
             board.add(new ArrayList<Piece>());
         }
@@ -240,9 +255,10 @@ public class Board {
         board.get(0).set(6,new Piece(Color.BLACK,PieceType.KNIGHT,9));
         board.get(0).set(7,new Piece(Color.BLACK,PieceType.ROOK,10));
 
+//        board.get(4).set(4,new Piece(Color.BLACK,PieceType.KING,6));//todo remove test
+//        board.get(4).set(7,new Piece(Color.WHITE,PieceType.KING,0));
+
     }
-
-
     public void showBoardInTerminal(Board board){
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
@@ -251,7 +267,72 @@ public class Board {
             System.out.println("\n");
         }
     }
+    public void show2DListInTerminal(ArrayList<ArrayList<Piece>> tooBoard){
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                System.out.format("%-15s",tooBoard.get(i).get(j));
+            }
+            System.out.println("\n");
+        }
+    }
     public ArrayList<ArrayList<Piece>> getBoard() {
         return board;
+    }
+    private void makeAFutureMove(Move move){
+        int srcX= move.srcX;
+        int srcY= move.srcY;
+        int destX= move.destX;
+        int destY= move.destY;
+
+        if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&!isWhiteTurn()){
+            System.out.println("not whites turn");
+            return;
+        }
+        if (board.get(srcY).get(srcX).getColor()==Color.BLACK&&isWhiteTurn()){
+            System.out.println("not blacks turn");
+            return;
+        }
+
+        if (!rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){//move not legal
+            System.out.println("move not legal");
+            return;
+        }
+
+        board.get(srcY).get(srcX).setFirstMove(false);
+        //castling
+        if (rules.destPieceIsSameColor(destX,destY,board.get(srcY).get(srcX))){
+            if (srcX<destX){//move is to the right
+                board.get(destY).set(destX-1,board.get(srcY).get(srcX));//king
+                board.get(destY).set(destX-2,board.get(srcY).get(destX));//rook
+                board.get(srcY).set(srcX,emptyPiece);
+                board.get(srcY).set(destX,emptyPiece);
+                System.out.println("rokad commplet");
+            }
+            if (destX<srcX){//move is to the left
+                board.get(destY).set(destX+2,board.get(srcY).get(srcX));//king
+                board.get(destY).set(destX+3,board.get(srcY).get(destX));//rook
+                board.get(srcY).set(srcX,emptyPiece);
+                board.get(srcY).set(destX,emptyPiece);
+                System.out.println("rokad commplet");
+            }
+        }
+
+        if (rules.pawnPromotion(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
+            board.get(srcY).set(srcX,emptyPiece);
+
+        } else {//normal move
+            board.get(destY).set(destX,board.get(srcY).get(srcX));
+            board.get(srcY).set(srcX,emptyPiece);
+        }
+        //every legal move
+        nrOfMoves++;
+
+        getAllLegalMoves();
+
+
+        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){
+//            System.out.println("cant move white king is in check!");
+            undoMove();
+        }
     }
 }
