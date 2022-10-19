@@ -10,10 +10,10 @@ public class Board {
     public static final int column =8;
     public static final int row = 8;
     public Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
-    public ArrayList<Point> legalMoves = new ArrayList<Point>();
-    public ArrayList<Move> allLegalMoves = new ArrayList<Move>();
-    public ArrayList<Move> allLegalBlackMoves = new ArrayList<Move>();
-    public ArrayList<Move> allLegalWhiteMoves = new ArrayList<Move>();
+    public ArrayList<Point> legalMoves = new ArrayList<>();
+    public ArrayList<Move> allLegalMoves = new ArrayList<>();
+    public ArrayList<Move> allLegalBlackMoves = new ArrayList<>();
+    public ArrayList<Move> allLegalWhiteMoves = new ArrayList<>();
     Eval eval = new Eval(this);
     public ArrayList<ArrayList<ArrayList<Piece>>> gameStateList2 = new ArrayList<>();
     Infinity infinityWhite;
@@ -43,7 +43,7 @@ public class Board {
         this.infinityBlack = new Infinity(this,Color.BLACK);
     }
 
-    public ArrayList<Point> getLegalMoves(int srcX,int srcY,Piece piece){
+    public ArrayList<Point> getLegalMovesForPiece(int srcX, int srcY){
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
                 if (rules.isLegalMove(srcX,srcY,j,i,board.get(srcY).get(srcX))){

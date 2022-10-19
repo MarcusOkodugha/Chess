@@ -19,8 +19,8 @@ public class BoardView  {
     boolean flipBlack =false,flipWhite = false;
     JFrame frame = new JFrame();
     BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
-    Image imgs[] = new Image[12];
-    Icon imgsIcons[] = new Icon[12];
+    Image[] imgs = new Image[12];
+    Icon[] imgsIcons = new Icon[12];
     JLabel[][] numberTiles;
     JLabel[][] invicebelLables;
     JPanel panel = new JPanel();
@@ -83,8 +83,13 @@ public class BoardView  {
 //                    invicebelLabel.setBackground(Color.RED);
                     tile.setIcon(icon);
                 }
+
                 numberTiles[i][j]=tile;
                 numberTiles[i][j].setOpaque(true);
+                if (i==1&&j==1){
+                    numberTiles[1][1].setBounds(1*blockSize,1*blockSize,-blockSize,-blockSize);//todo remvoe rotation test
+                    numberTiles[1][1].setBackground(Color.BLUE);//todo remvoe rotation test
+                }
 //                panel.setLayer(numberTiles[i][j],JLayeredPane.DEFAULT_LAYER);
                 panel.add(numberTiles[i][j]);
 
@@ -177,7 +182,8 @@ public class BoardView  {
 
     private void showLegalMoves(MouseEvent e){
         int k=0;
-        for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
+        show();
+        for (Point p:board.getLegalMovesForPiece(srcX,srcY)) {
             panel.repaint();
             if (holdingPieceIcon!=null){
                 paintOnMouse(holdingPieceIcon,e);
