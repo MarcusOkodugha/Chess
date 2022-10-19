@@ -1,6 +1,6 @@
 package marcus.okodugha.chessv1.View;
 import marcus.okodugha.chessv1.Model.*;
-import marcus.okodugha.chessv1.Model.Infinity.Infinity;
+
 import java.awt.Color;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -13,11 +13,9 @@ import static marcus.okodugha.chessv1.Model.Board.column;
 import static marcus.okodugha.chessv1.Model.Board.row;
 
 public class BoardView  {
-    Color lightBlueColor = new Color(235, 233,210);
-    Color beige = new Color(75, 115, 153);
+    Color beige = new Color(235, 233,210);
+    Color lightBlueColor = new Color(75, 115, 153);
     Board board;
-    Infinity infinity;
-    Infinity infinity2;
     boolean flipBlack =false,flipWhite = false;
     JFrame frame = new JFrame();
     BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
@@ -31,10 +29,10 @@ public class BoardView  {
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
     JButton resetButton = new JButton("Reset");
-    JButton infinityButton = new JButton("Infinity");
+    JButton infinityWhiteButton = new JButton("Infinity White");
     JButton button1 = new JButton("1");
-    JButton button2 = new JButton("2");
-    JButton button3 = new JButton("3");
+    JButton moveButton = new JButton("move");
+    JButton infinityBlackButton = new JButton("Infinity Black");
 
     int srcX=0;
     int srcY=0;
@@ -46,9 +44,6 @@ public class BoardView  {
     public BoardView(Board board) throws IOException {
         this.board = board;
         initBoardView();
-        this.infinity = infinity;
-        this.infinity2 = infinity2;
-
     }
 
     public void initBoardView() throws IOException {
@@ -109,17 +104,17 @@ public class BoardView  {
         button1.setPreferredSize(new Dimension(100,30));
         button1.addActionListener(actionListener);
 
-        menuPanel.add(button2);
-        button2.setPreferredSize(new Dimension(100,30));
-        button2.addActionListener(actionListener);
+        menuPanel.add(moveButton);
+        moveButton.setPreferredSize(new Dimension(100,30));
+        moveButton.addActionListener(actionListener);
 
-        menuPanel.add(button3);
-        button3.setPreferredSize(new Dimension(100,30));
-        button3.addActionListener(actionListener);
+        menuPanel.add(infinityBlackButton);
+        infinityBlackButton.setPreferredSize(new Dimension(100,30));
+        infinityBlackButton.addActionListener(actionListener);
 
-        menuPanel.add(infinityButton);
-        infinityButton.setPreferredSize(new Dimension(100,30));
-        infinityButton.addActionListener(actionListener);
+        menuPanel.add(infinityWhiteButton);
+        infinityWhiteButton.setPreferredSize(new Dimension(100,30));
+        infinityWhiteButton.addActionListener(actionListener);
 
         menuPanel.add(undoButton);
         undoButton.setPreferredSize(new Dimension(100,30));
@@ -171,25 +166,39 @@ public class BoardView  {
             }
             white = !white;
         }
+        if (board.getLatestMove()!=null){
+            paintTile(board.getLatestMove().srcX,board.getLatestMove().srcY,new Color(255,247,0));//yellow
+            paintTile(board.getLatestMove().destX,board.getLatestMove().destY,new Color(204,153,255));//purple
+
+        }
+
     }
 
 
     private void showLegalMoves(MouseEvent e){
         int k=0;
-
         for (Point p:board.getLegalMoves(srcX,srcY,board.getBoard().get(srcY).get(srcX))) {
             panel.repaint();
             if (holdingPieceIcon!=null){
-
                 paintOnMouse(holdingPieceIcon,e);
             }
             if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getIcon()==null){
-                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.GREEN);
+                if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getBackground()==lightBlueColor){
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(new Color(62,156,123));//dark green
+                }else {
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(new Color(174,238,163));//light green
+                }
             }else {
-                numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(Color.RED);
+                if (numberTiles[(board.legalMoves.get(k).y)][(board.legalMoves.get(k).x)].getBackground()==lightBlueColor){
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(new Color(237,12,15));//dark Red
+                }else {
+                    numberTiles[board.legalMoves.get(k).y][board.legalMoves.get(k).x].setBackground(new Color(249,70,63));//light Red
+                }
             }
             k++;
         }
+        if (!board.legalMoves.isEmpty())paintTile(srcX,srcY,new Color(255,247,0));
+
         board.legalMoves.clear();
     }
 
@@ -235,6 +244,7 @@ public class BoardView  {
                 srcY=e.getY()/blockSize;
                 show();
                 showLegalMoves(e);
+//                paintTile(srcX,srcY,new Color(255,247,0));
                 activPoint.x=srcX;
                 activPoint.y=srcY;
             }
@@ -251,6 +261,7 @@ public class BoardView  {
             // show legalMoves
             show();
             showLegalMoves(e);
+//            paintTile(srcX,srcY,new Color(255,247,0));
 
         }
         @Override
@@ -258,7 +269,8 @@ public class BoardView  {
             holdingPieceIcon=null;//reset holdigPieceIcon when mouse is released
             pressPoint=null;
             if (srcX==e.getX()/blockSize&&srcY==e.getY()/blockSize){//keeps showing legalmoves if mouse is released on srcX srcY
-            showLegalMoves(e);
+                showLegalMoves(e);
+//                paintTile(srcX,srcY,new Color(255,247,0));
             }else {
                 board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize));
                 panel.repaint();
@@ -279,7 +291,6 @@ public class BoardView  {
     private void paintOnMouse(Icon icon, MouseEvent e){
         icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
 //        invicebelLables[pressPoint.x][pressPoint.y].setBounds(e.getX(),e.getY(),biggerSize,biggerSize);
-
     }
 
 
@@ -294,23 +305,48 @@ public class BoardView  {
                 board.resetBoard();
                 show();
             }
-            if (e.getSource()==infinityButton){
-                infinity.makeCalculatedMove();
-                show();
+            if (e.getSource()==infinityWhiteButton){
+                if (board.isWhiteTurn()){
+                    board.getInfinityWhite().updateAllLegalAiMoves();
+                    if (board.allLegalWhiteMoves.size() == 0){
+                        System.out.println("no legal White moves Black Wins!!!!");
+                        board.gamIsRunning=false;
+                        return;
+                    }
+//                    board.getInfinityWhite().makeRetardedMove();
+                board.getInfinityWhite().makeCalculatedMove();
+                }show();
             }
             if (e.getSource()==button1){
 
                 show();
             }
-            if (e.getSource()==button2){
-                infinity2.makeCalculatedMove();
+            if (e.getSource()==moveButton){
+                if (board.isWhiteTurn()){
+                    board.getInfinityWhite().infinityMove();
+                }else {
+                    board.getInfinityBlack().infinityMove();
+                }
                 show();
             }
-            if (e.getSource()==button3){
+            if (e.getSource()== infinityBlackButton){
+                if (!board.isWhiteTurn()){
+                    board.getInfinityBlack().updateAllLegalAiMoves();
+                    if (board.allLegalBlackMoves.size() == 0){
+                        System.out.println("no legal Black moves White Wins!!!!");
+                        board.gamIsRunning=false;
+                        return;
+                    }
+                   board.getInfinityBlack().makeHighValueMovesElseOpening();
+                }
                 show();
             }
         }
     };
+
+    private void paintTile(int srcX, int srcY, Color color){
+        numberTiles[srcY][srcX].setBackground(color);
+    }
 
 
 }

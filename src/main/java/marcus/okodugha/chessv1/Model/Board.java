@@ -1,5 +1,6 @@
 package marcus.okodugha.chessv1.Model;
 
+import marcus.okodugha.chessv1.Model.Infinity.Eval;
 import marcus.okodugha.chessv1.Model.Infinity.Infinity;
 
 import java.awt.*;
@@ -13,20 +14,21 @@ public class Board {
     public ArrayList<Move> allLegalMoves = new ArrayList<Move>();
     public ArrayList<Move> allLegalBlackMoves = new ArrayList<Move>();
     public ArrayList<Move> allLegalWhiteMoves = new ArrayList<Move>();
-
+    Eval eval = new Eval(this);
     public ArrayList<ArrayList<ArrayList<Piece>>> gameStateList2 = new ArrayList<>();
-    Infinity infinity;
-    Infinity infinity2;
+    Infinity infinityWhite;
+    Infinity infinityBlack;
     private ArrayList<ArrayList<Piece>> board;
+    private Move latestMove;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
-    private final int maxGameStates=300;
+    private final int maxGameStates=900;
     private Rules rules;
     int nrOfMoves=0;
     public boolean whiteKingIsInCheck;
     public boolean blackKingIsInCheck;
     public boolean whiteKingIsInCheck2;
     public boolean blackKingIsInCheck2;
-    private boolean gamIsRunning=true;
+    public boolean gamIsRunning=true;
 
     public Board() {
         board= new ArrayList<>();
@@ -37,8 +39,8 @@ public class Board {
             initBoard(gameStateList2.get(i));
         }
         copyAndAdd(board);
-        this.infinity = new Infinity(this,Color.WHITE);
-        this.infinity2 = new Infinity(this,Color.BLACK);
+        this.infinityWhite = new Infinity(this,Color.WHITE);
+        this.infinityBlack = new Infinity(this,Color.BLACK);
     }
 
     public ArrayList<Point> getLegalMoves(int srcX,int srcY,Piece piece){
@@ -71,7 +73,6 @@ public class Board {
                             }
                             if (quickMove(new Move(j,i,l,k))){
                                 allLegalMoves.add(new Move(j,i,l,k));
-
                                 if (board.get(i).get(j).getColor()==Color.WHITE){
                                     allLegalWhiteMoves.add(new Move(j,i,l,k));
                                 }
@@ -126,8 +127,7 @@ public class Board {
 
         revertMove(srcX, srcY, destX, destY, srcPiece, destPiece);
 
-        if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&whiteKingIsInCheck2||board.get(srcY).get(srcX).getColor()==Color.BLACK&&blackKingIsInCheck2){
-//            System.out.println("move is not your legal king will be in check");
+        if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&whiteKingIsInCheck2||board.get(srcY).get(srcX).getColor()==Color.BLACK&&blackKingIsInCheck2){//your king will be in check
             return false;
         }
         return true;
@@ -165,15 +165,16 @@ public class Board {
         }
 
         if (!rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){//move not legal
-            System.out.println("move not legal");
+//            System.out.println("move not legal");
             return;
         }
 
         if (!listContainsMove(allLegalMoves,move)){
-            System.out.println("list did not contain move move therfore not legal");
+//            System.out.println("list did not contain move move therfore not legal");
             return;
         }
-
+        eval.getEval();
+        latestMove=move;
         board.get(srcY).get(srcX).setFirstMove(false);
 
         handelMoveType(srcX, srcY, destX, destY);
@@ -182,26 +183,26 @@ public class Board {
         copyAndAdd(board);
         getAllLegalMoves();
 
-        if (isWhiteTurn()){
-            infinity.updateAllLegalAiMoves();
-            if (allLegalWhiteMoves.size() == 0){
-                System.out.println("no legal White moves Black Wins!!!!");
-                gamIsRunning=false;
-                return;
-            }
-//            infinity.makeRetardedMove();
-            infinity.makeCalculatedMove();
-        }
+//        if (isWhiteTurn()){
+//            infinity.updateAllLegalAiMoves();
+//            if (allLegalWhiteMoves.size() == 0){
+//                System.out.println("no legal White moves Black Wins!!!!");
+//                gamIsRunning=false;
+//                return;
+//            }
+//           infinity.makeRetardedMove();
+////            infinity.makeCalculatedMove();
+//        }
 
         if (!isWhiteTurn()){
-            infinity2.updateAllLegalAiMoves();
+            infinityBlack.updateAllLegalAiMoves();
             if (allLegalBlackMoves.size() == 0){
                 System.out.println("no legal Black moves White Wins!!!!");
                 gamIsRunning=false;
                 return;
             }
 //            infinity2.makeCalculatedMove();
-            infinity2.playOpeningThenCalculatedMoves();
+            infinityBlack.makeHighValueMovesElseOpening();
         }
 
 //        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){//todo remove
@@ -238,7 +239,7 @@ public class Board {
     public void copyAndAdd(ArrayList<ArrayList<Piece>> inBoard){
 
         if (nrOfMoves==maxGameStates){
-            System.out.println("stopped playing due to max move limit");
+            System.out.println("stopped playing due to max move limit nr of moves :"+nrOfMoves);
             gamIsRunning =false;
             return;
         }
@@ -286,7 +287,7 @@ public class Board {
         }
         System.out.println("game reset");
     }
-    private boolean isWhiteTurn(){
+    public boolean isWhiteTurn(){
         return nrOfMoves%2==0;
     }
     private void initBoard(ArrayList<ArrayList<Piece>> board){
@@ -356,4 +357,15 @@ public class Board {
         return board;
     }
 
+    public Infinity getInfinityWhite() {
+        return infinityWhite;
+    }
+
+    public Infinity getInfinityBlack() {
+        return infinityBlack;
+    }
+
+    public Move getLatestMove() {
+        return latestMove;
+    }
 }
