@@ -1,19 +1,31 @@
 package marcus.okodugha.chessv1.Model;
 
+import javafx.animation.AnimationTimer;
 import marcus.okodugha.chessv1.Model.Infinity.Eval;
 import marcus.okodugha.chessv1.Model.Infinity.Infinity;
+import marcus.okodugha.chessv1.View.Sound;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Board {
     public static final int column =8;
     public static final int row = 8;
+    private final int maxGameStates=900;
     public Piece emptyPiece = new Piece(Color.NOCOLOR,PieceType.EMPTY,12);
     public ArrayList<Point> legalMoves = new ArrayList<>();
     public ArrayList<Move> allLegalMoves = new ArrayList<>();
+    public ArrayList<Move> testlist = new ArrayList<>();
     public ArrayList<Move> allLegalBlackMoves = new ArrayList<>();
     public ArrayList<Move> allLegalWhiteMoves = new ArrayList<>();
+    public boolean[][] blackAttacks =new boolean[row][column];
+    public boolean[][] whiteAttacks =new boolean[row][column];
+    public boolean autoMove=false;
+
     Eval eval = new Eval(this);
     public ArrayList<ArrayList<ArrayList<Piece>>> gameStateList2 = new ArrayList<>();
     Infinity infinityWhite;
@@ -21,7 +33,6 @@ public class Board {
     private ArrayList<ArrayList<Piece>> board;
     private Move latestMove;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
-    private final int maxGameStates=900;
     private Rules rules;
     int nrOfMoves=0;
     public boolean whiteKingIsInCheck;
@@ -75,10 +86,13 @@ public class Board {
                                 allLegalMoves.add(new Move(j,i,l,k));
                                 if (board.get(i).get(j).getColor()==Color.WHITE){
                                     allLegalWhiteMoves.add(new Move(j,i,l,k));
-                                }
+                                    whiteAttacks[l][k]=true;
+                                    testlist.add(new Move(j,i,l,k));
+                                }else {whiteAttacks[l][k]=false;}
                                 if (board.get(i).get(j).getColor()==Color.BLACK){
                                     allLegalBlackMoves.add(new Move(j,i,l,k));
-                                }
+                                    blackAttacks[l][k]=true;
+                                }else {blackAttacks[l][k]=false;}
                             }
                         }
                     }
@@ -88,14 +102,6 @@ public class Board {
         return allLegalMoves;
     }
 
-    public boolean listContainsMove(ArrayList<Move> list, Move move){
-        for (Move m:list) {
-            if (m.srcX==move.srcX&&m.srcY==move.srcY&&m.destX==move.destX&&m.destY==move.destY){
-                return true;
-            }
-        }
-        return false;
-    }
 
     public void getAllLegalMoves2(){
         whiteKingIsInCheck2=false;
@@ -150,11 +156,9 @@ public class Board {
         board.get(srcY).set(srcX, srcPiece);
     }
 
-    public void movePiece(Move move){
+    public void movePiece(Move move)  {
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
-
         if (!gamIsRunning)return;
-
         if (board.get(srcY).get(srcX).getColor()==Color.WHITE&&!isWhiteTurn()){
             System.out.println("not whites turn");
             return;
@@ -163,52 +167,45 @@ public class Board {
             System.out.println("not blacks turn");
             return;
         }
-
         if (!rules.isLegalMove(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){//move not legal
-//            System.out.println("move not legal");
+            System.out.println("move not legal");
             return;
         }
-
         if (!listContainsMove(allLegalMoves,move)){
-//            System.out.println("list did not contain move move therfore not legal");
+            System.out.println("list did not contain move move therfore not legal");
             return;
         }
-        eval.getEval();
         latestMove=move;
         board.get(srcY).get(srcX).setFirstMove(false);
 
         handelMoveType(srcX, srcY, destX, destY);
-
+        Sound.makeSound();
+//        eval.getEval();
         nrOfMoves++;
         copyAndAdd(board);
-        getAllLegalMoves();
+        autoMove();
 
-//        if (isWhiteTurn()){
-//            infinity.updateAllLegalAiMoves();
-//            if (allLegalWhiteMoves.size() == 0){
-//                System.out.println("no legal White moves Black Wins!!!!");
-//                gamIsRunning=false;
-//                return;
-//            }
-//           infinity.makeRetardedMove();
-////            infinity.makeCalculatedMove();
-//        }
 
-        if (!isWhiteTurn()){
-            infinityBlack.updateAllLegalAiMoves();
-            if (allLegalBlackMoves.size() == 0){
-                System.out.println("no legal Black moves White Wins!!!!");
-                gamIsRunning=false;
-                return;
-            }
-//            infinity2.makeCalculatedMove();
-            infinityBlack.makeHighValueMovesElseOpening();
+//            infinityWhite.infinityMove();
+//            infinityBlack.infinityMove();
+
+
+    }
+
+    public void autoMove(){
+        if (!autoMove){
+            return;
         }
+        try {
+            TimeUnit.MILLISECONDS.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        infinityWhite.infinityMove();
+        infinityBlack.infinityMove();
+//            if (isWhiteTurn()){ board.getInfinityWhite().infinityMove();
+//            }else {board.getInfinityBlack().infinityMove();}
 
-//        if (!isWhiteTurn()&&whiteKingIsInCheck||isWhiteTurn()&&blackKingIsInCheck){//todo remove
-//            System.out.println("cant move king is in check!");
-////            undoMove();
-//        }
     }
 
     private void handelMoveType(int srcX, int srcY, int destX, int destY) {
@@ -226,7 +223,6 @@ public class Board {
                 board.get(srcY).set(destX,emptyPiece);
             }
         }
-
         if (rules.pawnPromotion(srcX,srcY,destX,destY,board.get(srcY).get(srcX))){
             board.get(srcY).set(srcX,emptyPiece);
 
@@ -314,7 +310,7 @@ public class Board {
             board.get(1).set(i,new Piece(Color.BLACK,PieceType.PAWN,11));
             board.get(6).set(i,new Piece(Color.WHITE,PieceType.PAWN,5));
         }
-        //white back row
+//        //white back row
         board.get(7).set(0,new Piece(Color.WHITE,PieceType.ROOK,4));
         board.get(7).set(1,new Piece(Color.WHITE,PieceType.KNIGHT,3));
         board.get(7).set(2,new Piece(Color.WHITE,PieceType.BISHOP,2));
@@ -333,18 +329,12 @@ public class Board {
         board.get(0).set(6,new Piece(Color.BLACK,PieceType.KNIGHT,9));
         board.get(0).set(7,new Piece(Color.BLACK,PieceType.ROOK,10));
 
-//        board.get(4).set(4,new Piece(Color.BLACK,PieceType.KING,6));//todo remove test
-//        board.get(4).set(7,new Piece(Color.WHITE,PieceType.KING,0));
+        //todo remove test board
+//        board.get(4).set(3,new Piece(Color.WHITE,PieceType.QUEEN,1));
+//        board.get(1).set(3,new Piece(Color.BLACK,PieceType.QUEEN,7));
 
     }
-    public void showBoardInTerminal(Board board){
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < column; j++) {
-                System.out.format("%-15s",board.board.get(i).get(j));
-            }
-            System.out.println("\n");
-        }
-    }
+
     public void show2DListInTerminal(ArrayList<ArrayList<Piece>> tooBoard){
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
@@ -368,4 +358,23 @@ public class Board {
     public Move getLatestMove() {
         return latestMove;
     }
+    public boolean listContainsMove(ArrayList<Move> list, Move move){
+        if ((list==null)||(move==null)){ System.out.println("false");return false;}
+        for (Move m:list) {
+            if (m.srcX==move.srcX&&m.srcY==move.srcY&&m.destX==move.destX&&m.destY==move.destY){
+                return true;
+            }
+        }
+        return false;
+    }
+    public boolean listContainsPoint(ArrayList<Move> list, Move move){
+        if ((list==null)||(move==null))return false;
+        for (Move m:list) {
+            if (m.destX==move.destX&&m.destY==move.destY){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

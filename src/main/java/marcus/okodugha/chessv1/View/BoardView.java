@@ -7,8 +7,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.TimeUnit;
+
 import static marcus.okodugha.chessv1.Model.Board.column;
 import static marcus.okodugha.chessv1.Model.Board.row;
 
@@ -29,10 +33,10 @@ public class BoardView  {
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
     JButton resetButton = new JButton("Reset");
-    JButton infinityWhiteButton = new JButton("Infinity White");
-    JButton button1 = new JButton("1");
+    JButton infinityWhiteButton = new JButton("Infinity W");
+    JButton button1 = new JButton("Toggle auto");
     JButton moveButton = new JButton("move");
-    JButton infinityBlackButton = new JButton("Infinity Black");
+    JButton infinityBlackButton = new JButton("Infinity B");
 
     int srcX=0;
     int srcY=0;
@@ -86,10 +90,6 @@ public class BoardView  {
 
                 numberTiles[i][j]=tile;
                 numberTiles[i][j].setOpaque(true);
-                if (i==1&&j==1){
-                    numberTiles[1][1].setBounds(1*blockSize,1*blockSize,-blockSize,-blockSize);//todo remvoe rotation test
-                    numberTiles[1][1].setBackground(Color.BLUE);//todo remvoe rotation test
-                }
 //                panel.setLayer(numberTiles[i][j],JLayeredPane.DEFAULT_LAYER);
                 panel.add(numberTiles[i][j]);
 
@@ -176,6 +176,10 @@ public class BoardView  {
             paintTile(board.getLatestMove().destX,board.getLatestMove().destY,new Color(204,153,255));//purple
 
         }
+//todo rmove test
+//        for (Move m:board.testlist) {
+//            numberTiles[m.destY][m.destX].setBackground(Color.RED);//todo remove
+//        }
 
     }
 
@@ -203,7 +207,7 @@ public class BoardView  {
             }
             k++;
         }
-        if (!board.legalMoves.isEmpty())paintTile(srcX,srcY,new Color(255,247,0));
+//        if (!board.legalMoves.isEmpty())paintTile(srcX,srcY,new Color(255,247,0));
 
         board.legalMoves.clear();
     }
@@ -238,7 +242,8 @@ public class BoardView  {
 
             if (activPoint.x!=-1&&activPoint.y!=-1){//second click
 //                System.out.println("second click");
-                board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
+                    board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
+
                 board.legalMoves.clear();
                 show();
                 activPoint.x=-1;
@@ -281,6 +286,7 @@ public class BoardView  {
                 board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize));
                 panel.repaint();
                 show();
+
             }
         }
         @Override
@@ -308,7 +314,8 @@ public class BoardView  {
                 show();
             }
             if (e.getSource()==resetButton){
-                board.resetBoard();
+                board=new Board();
+//                board.resetBoard();
                 show();
             }
             if (e.getSource()==infinityWhiteButton){
@@ -320,11 +327,17 @@ public class BoardView  {
                         return;
                     }
 //                    board.getInfinityWhite().makeRetardedMove();
-                board.getInfinityWhite().makeCalculatedMove();
+                        board.getInfinityWhite().infinityMove();
+
                 }show();
             }
             if (e.getSource()==button1){
-
+                board.autoMove=true;
+                if (board.isWhiteTurn()){
+                    board.getInfinityWhite().infinityMove();
+                }else {
+                    board.getInfinityBlack().infinityMove();
+                }
                 show();
             }
             if (e.getSource()==moveButton){
@@ -343,7 +356,7 @@ public class BoardView  {
                         board.gamIsRunning=false;
                         return;
                     }
-                   board.getInfinityBlack().makeHighValueMovesElseOpening();
+                        board.getInfinityBlack().infinityMove();
                 }
                 show();
             }

@@ -13,9 +13,7 @@ public class Eval {
 
     public Eval(Board board) {
         this.board=board;
-
     }
-
     public int getEval() {
         eval=0;
         for (int i = 0; i < row; i++) {
