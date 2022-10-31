@@ -1,6 +1,6 @@
 package marcus.okodugha.chessv1.View;
 import marcus.okodugha.chessv1.Model.*;
-
+//git hub test dev 2
 import java.awt.Color;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -175,9 +175,6 @@ public class BoardView  {
 //            numberTiles[m.destY][m.destX].setBackground(Color.RED);//todo remove
 //        }
     }
-
-
-
 
     private void showLegalMoves(MouseEvent e){
         int k=0;
