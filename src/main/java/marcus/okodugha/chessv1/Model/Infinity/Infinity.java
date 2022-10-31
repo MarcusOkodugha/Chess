@@ -167,7 +167,7 @@ public class Infinity {
         for (Move b: allLegalAiMoves) {
             if (!destPointIsEmpty(new Point(b.destX,b.destY))){
                 bestMove=b;
-                if (board.getBoard().get(b.destY).get(b.destX).getPieceType().ordinal()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().ordinal()){//kill highest value piece
+                if (board.getBoard().get(b.destY).get(b.destX).getPieceType().getValue()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().getValue()){//kill highest value piece
                     bestMove = new Move(b.srcX,b.srcY,b.destX,b.destY);
                 }
             }
@@ -180,10 +180,10 @@ public class Infinity {
         for (Move m: allLegalAiMoves) {
             if (!destPointIsEmpty(new Point(m.destX,m.destY))){//kill move
                 if (bestMove==null) bestMove=m;
-                if (board.getBoard().get(m.destY).get(m.destX).getPieceType().ordinal()>=board.getBoard().get(m.srcY).get(m.srcX).getPieceType().ordinal()){//killed piece is more worth or equal to the src piece
+                if (board.getBoard().get(m.destY).get(m.destX).getPieceType().getValue()>=board.getBoard().get(m.srcY).get(m.srcX).getPieceType().getValue()){//killed piece is more worth or equal to the src piece
                     if (bestMove==null) bestMove=m;
 
-                    if (board.getBoard().get(m.destY).get(m.destX).getPieceType().ordinal()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().ordinal()){//kill highest value piece
+                    if (board.getBoard().get(m.destY).get(m.destX).getPieceType().getValue()>board.getBoard().get(bestMove.destY).get(bestMove.destX).getPieceType().getValue()){//kill highest value piece
                         bestMove = new Move(m.srcX,m.srcY,m.destX,m.destY);
                     }
                 }

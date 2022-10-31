@@ -8,7 +8,6 @@ public class Rules {
 
     public Rules(Board board) {
         this.board = board;
-//        legalMoves.add(new Point(4,7));
 
     }
 
@@ -17,8 +16,6 @@ public class Rules {
     }
 
     public boolean isLegalMove(int srcX, int srcY, int destX, int destY, Piece piece){
-
-//        board.copyBoard(board.getBoard(),board.boardAfterMove);//todo maby remvo
 
         switch (piece.getPieceType()){
             case PAWN:if (isPawnMoveLegal(srcX, srcY, destX, destY, piece)) return true;
@@ -124,7 +121,7 @@ public class Rules {
         }
         return false;
     }
-    private boolean destIsEmpty(int destX, int destY) {
+    public boolean destIsEmpty(int destX, int destY) {
         return board.getBoard().get(destY).get(destX).getPieceType() == PieceType.EMPTY;//destination squarer is empty
     }
     public boolean destPieceIsSameColor(int destX, int destY, Piece piece) {
@@ -228,7 +225,6 @@ public class Rules {
     }
     public Color kingIsInCheck(int destX, int destY){
         if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
-//            System.out.println(board.getBoard().get(destY).get(destX) +"king is in check");
              return board.getBoard().get(destY).get(destX).getColor();
         }
         return board.emptyPiece.getColor();

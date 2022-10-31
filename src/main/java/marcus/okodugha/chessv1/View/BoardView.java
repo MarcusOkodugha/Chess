@@ -7,53 +7,59 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.Timer;
 
-import static marcus.okodugha.chessv1.Model.Board.column;
-import static marcus.okodugha.chessv1.Model.Board.row;
+import static marcus.okodugha.chessv1.Model.Board.*;
+import static marcus.okodugha.chessv1.Model.BordUtilities.getBoardUtilitiesInstance;
 
 public class BoardView  {
     Color beige = new Color(235, 233,210);
     Color lightBlueColor = new Color(75, 115, 153);
-    Board board;
-    boolean flipBlack =false,flipWhite = false;
+    Board board = getBoardInstance();
     JFrame frame = new JFrame();
-    BufferedImage all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
+
     Image[] imgs = new Image[12];
     Icon[] imgsIcons = new Icon[12];
     JLabel[][] numberTiles;
     JLabel[][] invicebelLables;
     JPanel panel = new JPanel();
-//    JLayeredPane panel = new JLayeredPane();
 
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
     JButton resetButton = new JButton("Reset");
-    JButton infinityWhiteButton = new JButton("Infinity W");
-    JButton button1 = new JButton("Toggle auto");
-    JButton moveButton = new JButton("move");
-    JButton infinityBlackButton = new JButton("Infinity B");
+    JButton autoBlack = new JButton("AutoBlack");
+    JButton devButton = new JButton("Dev");
+    JButton autoButton = new JButton("Auto");
+    JButton moveButton = new JButton("Move");
 
-    int srcX=0;
-    int srcY=0;
+    private int srcX=0;
+    private int srcY=0;
     private final int blockSize =94;
+    private static BoardView viewInstance = null;
 
-
-
-
-    public BoardView(Board board) throws IOException {
-        this.board = board;
-        initBoardView();
+    public BoardView() {
     }
 
-    public void initBoardView() throws IOException {
-//        frame.setBounds(1020,300,752,752); //todo för stor skärm
+    public static BoardView getViewInstance() {
+        if (viewInstance ==null){
+            viewInstance =new BoardView();
+        }
+        return viewInstance;
+    }
+
+    BufferedImage all;
+    {
+        try {
+            all = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\chess.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void initBoardView() {
         frame.setBounds(400,0,752,792);
-//        frame.setSize(528,552);
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
         invicebelLables=new JLabel[row][column];
@@ -66,60 +72,50 @@ public class BoardView  {
                 ind++;
             }
         }
-//        menuPanel.setBackground();
+
         menuPanel.setPreferredSize(new Dimension(100,40));
         panel.setLayout(new GridLayout(row,column));
         boolean white = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 JLabel tile = new JLabel();
-                JLabel invicebelLabel = new JLabel();
                 if (white) {
                     tile.setBackground(beige);
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
                 tile.setBounds(i*blockSize,j*blockSize,blockSize,blockSize);
-//                invicebelLabel.setBounds(i*biggerSize,j*biggerSize,biggerSize,biggerSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
-//                    invicebelLabel.setIcon(icon);
-//                    invicebelLabel.setBackground(Color.RED);
                     tile.setIcon(icon);
                 }
-
                 numberTiles[i][j]=tile;
                 numberTiles[i][j].setOpaque(true);
-//                panel.setLayer(numberTiles[i][j],JLayeredPane.DEFAULT_LAYER);
                 panel.add(numberTiles[i][j]);
-
-//                invicebelLables[i][j]=invicebelLabel;
-//                invicebelLables[i][j].setOpaque(true);
-//                panel.setLayer(invicebelLables[i][j],1);
-//                panel.add(invicebelLables[i][j],2,0);
-
                 white = !white;
             }
             white = !white;
         }
 
-
         //menu Panel and buttons
-        menuPanel.add(button1);
-        button1.setPreferredSize(new Dimension(100,30));
-        button1.addActionListener(actionListener);
+
+
+
+        menuPanel.add(autoButton);
+        autoButton.setPreferredSize(new Dimension(100,30));
+        autoButton.addActionListener(actionListener);
 
         menuPanel.add(moveButton);
         moveButton.setPreferredSize(new Dimension(100,30));
         moveButton.addActionListener(actionListener);
 
-        menuPanel.add(infinityBlackButton);
-        infinityBlackButton.setPreferredSize(new Dimension(100,30));
-        infinityBlackButton.addActionListener(actionListener);
+        menuPanel.add(autoBlack);
+        autoBlack.setPreferredSize(new Dimension(100,30));
+        autoBlack.addActionListener(actionListener);
 
-        menuPanel.add(infinityWhiteButton);
-        infinityWhiteButton.setPreferredSize(new Dimension(100,30));
-        infinityWhiteButton.addActionListener(actionListener);
+        menuPanel.add(devButton);
+        devButton.setPreferredSize(new Dimension(100,30));
+        devButton.addActionListener(actionListener);
 
         menuPanel.add(undoButton);
         undoButton.setPreferredSize(new Dimension(100,30));
@@ -137,9 +133,6 @@ public class BoardView  {
         estPanel.setPreferredSize(new Dimension(40,40));
         //frame
         frame.add(menuPanel,BorderLayout.SOUTH);
-//        frame.add(estPanel,BorderLayout.EAST);
-//        frame.add(westPanel,BorderLayout.WEST);
-//        frame.add(southPanel,BorderLayout.SOUTH);
         frame.add(panel,BorderLayout.CENTER); //add gridview
         frame.addMouseMotionListener(mouseMotionListener);
         frame.addMouseListener(mouseListener);
@@ -152,6 +145,7 @@ public class BoardView  {
         boolean white = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+                Piece piece = board.getBoard().get(i).get(j);
                 if (white) {
                     numberTiles[i][j].setBackground(beige);
                 } else {
@@ -160,12 +154,12 @@ public class BoardView  {
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
 
                     numberTiles[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
-//                    invicebelLables[i][j].setIcon(imgsIcons[board.getBoard().get(i).get(j).getImageIndex()]);
-//                    invicebelLables[i][j].setBackground(Color.RED);//todo remove
                 }
                 if (board.getBoard().get(i).get(j).getImageIndex() == 12){
                     numberTiles[i][j].setIcon(null);
-//                    invicebelLables[i][j].setIcon(null);
+                }
+                if (piece.getPieceType()==PieceType.KING&&(board.whiteKingIsInCheck&&piece.getColor()== marcus.okodugha.chessv1.Model.Color.WHITE||board.blackKingIsInCheck&&piece.getColor()== marcus.okodugha.chessv1.Model.Color.BLACK)){
+                    paintTile(j,i,new Color(153,0,0));//paints kings that are in check red
                 }
                 white = !white;
             }
@@ -176,18 +170,19 @@ public class BoardView  {
             paintTile(board.getLatestMove().destX,board.getLatestMove().destY,new Color(204,153,255));//purple
 
         }
-//todo rmove test
+//        //todo rmove test
 //        for (Move m:board.testlist) {
 //            numberTiles[m.destY][m.destX].setBackground(Color.RED);//todo remove
 //        }
-
     }
+
+
 
 
     private void showLegalMoves(MouseEvent e){
         int k=0;
         show();
-        for (Point p:board.getLegalMovesForPiece(srcX,srcY)) {
+        for (Point p:getBoardUtilitiesInstance().getLegalMovesForPiece(srcX,srcY)) {
             panel.repaint();
             if (holdingPieceIcon!=null){
                 paintOnMouse(holdingPieceIcon,e);
@@ -207,8 +202,6 @@ public class BoardView  {
             }
             k++;
         }
-//        if (!board.legalMoves.isEmpty())paintTile(srcX,srcY,new Color(255,247,0));
-
         board.legalMoves.clear();
     }
 
@@ -230,32 +223,25 @@ public class BoardView  {
             }
         }
         @Override
-        public void mouseMoved(MouseEvent e) {
-
-        }
+        public void mouseMoved(MouseEvent e) {       }
     };
     Point activPoint = new Point(-1,-1);
 
     MouseListener mouseListener = new MouseListener() {
         @Override
         public void mouseClicked(MouseEvent e) {
-
-            if (activPoint.x!=-1&&activPoint.y!=-1){//second click
-//                System.out.println("second click");
-                    board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
-
+            if (activPoint.x!=-1&&activPoint.y!=-1){
+                board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
                 board.legalMoves.clear();
                 show();
                 activPoint.x=-1;
                 activPoint.y=-1;
             }
-            if (activPoint.x==-1&&activPoint.y==-1){//first click
-//                System.out.println("first click");
+            if (activPoint.x==-1&&activPoint.y==-1){
                 srcX=e.getX()/blockSize;
                 srcY=e.getY()/blockSize;
                 show();
                 showLegalMoves(e);
-//                paintTile(srcX,srcY,new Color(255,247,0));
                 activPoint.x=srcX;
                 activPoint.y=srcY;
             }
@@ -264,7 +250,6 @@ public class BoardView  {
             public void mousePressed(MouseEvent e) {
             srcX=e.getX()/blockSize;
             srcY=e.getY()/blockSize;
-//            System.out.println("mouse pressed on tile x = "+srcX+" y= "+srcY);
             if (board.getBoard().get(srcY).get(srcX).getPieceType()!= PieceType.EMPTY){//selected peice is not empty
                     holdingPieceIcon= imgsIcons[board.getBoard().get(srcY).get(srcX).getImageIndex()];
                     pressPoint = new Point(srcX,srcY);
@@ -272,7 +257,6 @@ public class BoardView  {
             // show legalMoves
             show();
             showLegalMoves(e);
-//            paintTile(srcX,srcY,new Color(255,247,0));
 
         }
         @Override
@@ -302,64 +286,31 @@ public class BoardView  {
     static int lastTime=0;
     private void paintOnMouse(Icon icon, MouseEvent e){
         icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
-//        invicebelLables[pressPoint.x][pressPoint.y].setBounds(e.getX(),e.getY(),biggerSize,biggerSize);
     }
 
 
-    ActionListener actionListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource()==undoButton){
-                board.undoMove();
-                show();
-            }
-            if (e.getSource()==resetButton){
-                board=new Board();
-//                board.resetBoard();
-                show();
-            }
-            if (e.getSource()==infinityWhiteButton){
-                if (board.isWhiteTurn()){
-                    board.getInfinityWhite().updateAllLegalAiMoves();
-                    if (board.allLegalWhiteMoves.size() == 0){
-                        System.out.println("no legal White moves Black Wins!!!!");
-                        board.gamIsRunning=false;
-                        return;
-                    }
-//                    board.getInfinityWhite().makeRetardedMove();
-                        board.getInfinityWhite().infinityMove();
+    ActionListener actionListener = e -> {
+        if (e.getSource()==undoButton){
+            getBoardUtilitiesInstance().undoMove();
+            show();
+        }
+        if (e.getSource()==resetButton){
+            getBoardUtilitiesInstance().resetBoard();
+            show();
+        }
+        if (e.getSource()== autoButton){//toggle autoMove
+            autoMove();
+        }
+        if (e.getSource()==moveButton){
+            move();
+        }
+        if (e.getSource()== devButton){
+            DevTools.devMode= !DevTools.devMode;//toggle devMode
+            System.out.println("dev mode "+DevTools.devMode);
+        }
+        if (e.getSource()== autoBlack){
+            DevTools.autoBlack=!DevTools.autoBlack;
 
-                }show();
-            }
-            if (e.getSource()==button1){
-                board.autoMove=true;
-                if (board.isWhiteTurn()){
-                    board.getInfinityWhite().infinityMove();
-                }else {
-                    board.getInfinityBlack().infinityMove();
-                }
-                show();
-            }
-            if (e.getSource()==moveButton){
-                if (board.isWhiteTurn()){
-                    board.getInfinityWhite().infinityMove();
-                }else {
-                    board.getInfinityBlack().infinityMove();
-                }
-                show();
-            }
-            if (e.getSource()== infinityBlackButton){
-                if (!board.isWhiteTurn()){
-                    board.getInfinityBlack().updateAllLegalAiMoves();
-                    if (board.allLegalBlackMoves.size() == 0){
-                        System.out.println("no legal Black moves White Wins!!!!");
-                        board.gamIsRunning=false;
-                        return;
-                    }
-                        board.getInfinityBlack().infinityMove();
-                }
-                show();
-            }
         }
     };
 
@@ -367,5 +318,23 @@ public class BoardView  {
         numberTiles[srcY][srcX].setBackground(color);
     }
 
+    Timer timer;
+    public void autoMove() {//todo make privet
+        board.autoMove= !board.autoMove;
+        if (!board.autoMove){
+            timer.cancel();
+        }else {
+            timer = new Timer();
+            timer.schedule(new TimerClass(), 0, 1000);
+        }
+    }
+
+    private void move() {
+        if (board.isWhiteTurn()){
+            board.getInfinityWhite().infinityMove();
+        }else {
+            board.getInfinityBlack().infinityMove();
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 package marcus.okodugha.chessv1.Model;
 
+
 public class Piece {
     private Color color;
     private PieceType pieceType;

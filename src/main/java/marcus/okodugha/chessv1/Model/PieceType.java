@@ -6,5 +6,21 @@ public enum PieceType {
     PieceType(int value) {
     }
 
+    public int getValue(){
+        int value=0;
+        switch (this){
+            case EMPTY -> value=0;
+            case PAWN -> value=1;
+            case KNIGHT -> value=3;
+            case BISHOP -> value=3;
+            case ROOK -> value=5;
+            case QUEEN -> value=9 ;
+            case KING -> value=100;
+        }
+        return value;
+    }
+
+
+
 }
 
