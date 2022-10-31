@@ -1,6 +1,5 @@
 package marcus.okodugha.chessv1.View;
 import marcus.okodugha.chessv1.Model.*;
-//git hub test dev 2
 import java.awt.Color;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Objects;
 import java.util.Timer;
 
 import static marcus.okodugha.chessv1.Model.Board.*;
