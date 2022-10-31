@@ -23,8 +23,8 @@ public class BoardView  {
     Icon[] imgsIcons = new Icon[12];
     JLabel[][] numberTiles;
     JLabel[][] invicebelLables;
-    JPanel panel = new JPanel();
-
+//    JPanel panel = new JPanel();
+    JLayeredPane panel = new JLayeredPane();
     JPanel menuPanel = new JPanel();
     JButton undoButton = new JButton("Undo");
     JButton resetButton = new JButton("Reset");
@@ -35,7 +35,7 @@ public class BoardView  {
 
     private int srcX=0;
     private int srcY=0;
-    private final int blockSize =94;
+    private final int blockSize =90;
     private static BoardView viewInstance = null;
 
     public BoardView() {
@@ -47,6 +47,15 @@ public class BoardView  {
         }
         return viewInstance;
     }
+    ImageIcon goldenBoarderImg;
+    private void initImages()  {
+        try {
+        BufferedImage image = ImageIO.read(new File("C:\\JavaProgram\\ChessV1\\src\\main\\java\\marcus\\okodugha\\chessv1\\resources\\goldenBorder90px.png"));
+        goldenBoarderImg = new ImageIcon(image);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
+    }
 
     BufferedImage all;
     {
@@ -57,7 +66,8 @@ public class BoardView  {
         }
     }
     public void initBoardView() {
-        frame.setBounds(400,0,752,792);
+        initImages();
+        frame.setBounds(400,10,(blockSize*8)+13,(blockSize*8)+76);//796
         frame.setLayout(new BorderLayout());
         numberTiles=new JLabel[row][column];
         invicebelLables=new JLabel[row][column];
@@ -72,7 +82,7 @@ public class BoardView  {
         }
 
         menuPanel.setPreferredSize(new Dimension(100,40));
-        panel.setLayout(new GridLayout(row,column));
+//        panel.setLayout(new GridLayout(row,column));//todo remove
         boolean white = true;
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -82,7 +92,7 @@ public class BoardView  {
                 } else {
                     tile.setBackground(lightBlueColor);
                 }
-                tile.setBounds(i*blockSize,j*blockSize,blockSize,blockSize);
+                tile.setBounds(j*blockSize,i*blockSize,blockSize,blockSize);
                 if(board.getBoard().get(i).get(j).getImageIndex() != 12){
                     Icon icon = new ImageIcon(imgs[board.getBoard().get(i).get(j).getImageIndex()]);
                     tile.setIcon(icon);
@@ -94,31 +104,29 @@ public class BoardView  {
             }
             white = !white;
         }
+        dynamicTile.setBounds(0,0,blockSize,blockSize);
+        panel.add(dynamicTile,JLayeredPane.DRAG_LAYER);
 
+        boarderTile.setBounds(0,0,blockSize,blockSize);
+        boarderTile.setIcon(goldenBoarderImg);
+        boarderTile.setOpaque(false);
+        panel.add(boarderTile,JLayeredPane.POPUP_LAYER);
         //menu Panel and buttons
-
-
-
         menuPanel.add(autoButton);
         autoButton.setPreferredSize(new Dimension(100,30));
         autoButton.addActionListener(actionListener);
-
         menuPanel.add(moveButton);
         moveButton.setPreferredSize(new Dimension(100,30));
         moveButton.addActionListener(actionListener);
-
         menuPanel.add(autoBlack);
         autoBlack.setPreferredSize(new Dimension(100,30));
         autoBlack.addActionListener(actionListener);
-
         menuPanel.add(devButton);
         devButton.setPreferredSize(new Dimension(100,30));
         devButton.addActionListener(actionListener);
-
         menuPanel.add(undoButton);
         undoButton.setPreferredSize(new Dimension(100,30));
         undoButton.addActionListener(actionListener);
-
         menuPanel.add(resetButton);
         resetButton.setPreferredSize(new Dimension(100,30));
         resetButton.addActionListener(actionListener);
@@ -172,6 +180,7 @@ public class BoardView  {
 //        for (Move m:board.testlist) {
 //            numberTiles[m.destY][m.destX].setBackground(Color.RED);//todo remove
 //        }
+
     }
 
     private void showLegalMoves(MouseEvent e){
@@ -198,6 +207,7 @@ public class BoardView  {
             k++;
         }
         board.legalMoves.clear();
+        dynamicTile.setIcon(null);
     }
 
     Icon holdingPieceIcon = null;
@@ -205,17 +215,7 @@ public class BoardView  {
     MouseMotionListener mouseMotionListener = new MouseMotionListener() {
         @Override
         public void mouseDragged(MouseEvent e) {
-            currentTime++;
-            if (lastTime+5<currentTime){
-                panel.repaint();
-                if (holdingPieceIcon!=null){
-                    paintOnMouse(holdingPieceIcon,e);
-                }
-                lastTime=currentTime;
-            }
-            if (holdingPieceIcon!=null){
-                paintOnMouse(holdingPieceIcon,e);
-            }
+            paintOnMouse(holdingPieceIcon,e);
         }
         @Override
         public void mouseMoved(MouseEvent e) {       }
@@ -260,12 +260,10 @@ public class BoardView  {
             pressPoint=null;
             if (srcX==e.getX()/blockSize&&srcY==e.getY()/blockSize){//keeps showing legalmoves if mouse is released on srcX srcY
                 showLegalMoves(e);
-//                paintTile(srcX,srcY,new Color(255,247,0));
             }else {
                 board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize));
-                panel.repaint();
+                dynamicTile.setIcon(null);
                 show();
-
             }
         }
         @Override
@@ -277,10 +275,13 @@ public class BoardView  {
     };
     int xMouseOffset =blockSize/2;
     int yMouseOffset=blockSize/2;
-    static int currentTime=0;
-    static int lastTime=0;
+    JLabel dynamicTile = new JLabel();
+    JLabel boarderTile = new JLabel();
     private void paintOnMouse(Icon icon, MouseEvent e){
-        icon.paintIcon(panel, frame.getGraphics(), e.getX()-xMouseOffset,e.getY()-yMouseOffset);
+        dynamicTile.setIcon(icon);
+        dynamicTile.setBounds(e.getX()-xMouseOffset,e.getY()-yMouseOffset,blockSize,blockSize);
+        boarderTile.setBounds(((e.getX())/90)*90,((e.getY())/90)*90,blockSize,blockSize);
+
     }
 
 
