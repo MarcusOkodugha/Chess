@@ -8,39 +8,28 @@ public class Rules {
 
     public Rules(Board board) {
         this.board = board;
-//        legalMoves.add(new Point(4,7));
 
     }
-    public boolean isLegalMove(int srcX, int srcY, int destX, int destY, Piece piece) {
-        if (piece.getPieceType() == PieceType.PAWN) {
-            if (isPawnMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            if (isBishopMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.ROOK) {
-            if (isRookMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.KING) {
-            if (isKingMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.QUEEN) {
-            if (isQueenMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
-        }
-        if (piece.getPieceType() == PieceType.KNIGHT) {
-            if (isKnightMoveLegal(srcX, srcY, destX, destY, piece)) {
-                return true;
-            }
+
+    public boolean isLegalMove(Move move){
+        return isLegalMove(move.srcX,move.srcY,move.destX,move.destY,board.getBoard().get(move.srcY).get(move.srcX));
+    }
+
+    public boolean isLegalMove(int srcX, int srcY, int destX, int destY, Piece piece){
+
+        switch (piece.getPieceType()){
+            case PAWN:if (isPawnMoveLegal(srcX, srcY, destX, destY, piece)) return true;
+                break;
+            case BISHOP:if (isBishopMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case ROOK:if (isRookMoveLegal(srcX, srcY, destX, destY, piece)) return true;
+                break;
+            case KING:if (isKingMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case QUEEN:if (isQueenMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
+            case KNIGHT:if (isKnightMoveLegal(srcX, srcY, destX, destY, piece))return true;
+                break;
         }
         return false;
     }
@@ -102,7 +91,6 @@ public class Rules {
             return false;
     }
     //basic rules
-
     private boolean moveIsForward(int srcY, int destY) {
         return srcY > destY;
     }
@@ -133,7 +121,7 @@ public class Rules {
         }
         return false;
     }
-    private boolean destIsEmpty(int destX, int destY) {
+    public boolean destIsEmpty(int destX, int destY) {
         return board.getBoard().get(destY).get(destX).getPieceType() == PieceType.EMPTY;//destination squarer is empty
     }
     public boolean destPieceIsSameColor(int destX, int destY, Piece piece) {
@@ -235,7 +223,6 @@ public class Rules {
     private boolean isEnemy(int srcX, int srcY, int destX, int destY){
         return board.getBoard().get(srcY).get(srcX).getColor()!=board.getBoard().get(destY).get(destX).getColor();
     }
-
     public Color kingIsInCheck(int destX, int destY){
         if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
              return board.getBoard().get(destY).get(destX).getColor();
@@ -243,6 +230,9 @@ public class Rules {
         return board.emptyPiece.getColor();
     }
 
+//    private boolean yourKingWillBeInCheck(){
+//
+//    }
     public boolean pawnPromotion(int srcX,int srcY,int destX,int destY,Piece piece){
         if (piece.getPieceType()==PieceType.PAWN){
             if (piece.getColor()==Color.WHITE&&destY==0){
@@ -262,7 +252,7 @@ public class Rules {
             if (destPieceIsSameColor(destX,destY,piece)){//same color
                 if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.ROOK){
                     if (intersection(srcX, srcY, destX, destY) == null||board.getBoard().get(intersectionPoint.y).get(intersectionPoint.x).getPieceType()==PieceType.ROOK){
-                        System.out.println("castlin legal");
+//                        System.out.println("castlin legal");
                         return true;
                     }
                 }
