@@ -1,7 +1,5 @@
 package marcus.okodugha.chessv1.Model;
 
-import marcus.okodugha.chessv1.Model.Color;
-
 import java.awt.*;
 import java.util.ArrayList;
 
@@ -84,7 +82,7 @@ public class BordUtilities {
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
         Piece srcPiece; Piece destPiece; srcPiece=board.getBoard().get(srcY).get(srcX); destPiece=board.getBoard().get(destY).get(destX);
 
-        handelMoveType(srcX, srcY, destX, destY);
+        handelMoveType(move,false);
 
         getBoardUtilitiesInstance().getAllLegalMoves2();
 
@@ -96,7 +94,8 @@ public class BordUtilities {
         return true;
     }
 
-    public void handelMoveType(int srcX, int srcY, int destX, int destY) {
+    public void handelMoveType(Move move,boolean realMove) {
+        int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
         Rules rules = new Rules(getBoardInstance());
         Board board= getBoardInstance();
         if (rules.destPieceIsSameColor(destX,destY,board.getBoard().get(srcY).get(srcX))){
@@ -113,9 +112,11 @@ public class BordUtilities {
                 board.getBoard().get(srcY).set(destX,board.emptyPiece);
             }
         }
-        if (rules.pawnPromotion(srcX,srcY,destX,destY,board.getBoard().get(srcY).get(srcX))){
-            board.getBoard().get(srcY).set(srcX,board.emptyPiece);
-
+        if (rules.pawnPromotion(move,board.getBoard().get(srcY).get(srcX))){
+            if (realMove){//real move is only true when called from movePiece never quickMove
+                getViewInstance().promotionPrompt(board.getBoard().get(srcY).get(srcX).getColor());
+                board.getBoard().get(srcY).set(srcX,board.emptyPiece);
+            }
         } else {//normal move
             board.getBoard().get(destY).set(destX,board.getBoard().get(srcY).get(srcX));
             board.getBoard().get(srcY).set(srcX,board.emptyPiece);
@@ -169,5 +170,10 @@ public class BordUtilities {
             }
         }
         System.out.println("game reset");
+    }
+
+    public void setPiece(Piece piece){
+        Board board =getBoardInstance();
+        board.getBoard().get(board.latestMove.destY).set(board.latestMove.destX,piece);
     }
 }

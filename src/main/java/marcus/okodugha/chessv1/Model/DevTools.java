@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class DevTools extends Board{
     public static boolean devMode;
-    public static boolean autoBlack;
+    public static boolean autoBlack=true;
 
 
     public void showBoardInTerminal(Board board){

@@ -1,5 +1,6 @@
 package marcus.okodugha.chessv1.Model;
 
+import javax.swing.*;
 import java.util.TimerTask;
 
 public class TimerClass  extends TimerTask{
@@ -11,4 +12,5 @@ public class TimerClass  extends TimerTask{
                 board.getInfinityBlack().infinityMove();
             }
         }
+
 }

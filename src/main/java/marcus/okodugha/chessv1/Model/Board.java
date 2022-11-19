@@ -6,6 +6,8 @@ import marcus.okodugha.chessv1.View.Sound;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static marcus.okodugha.chessv1.Model.BordUtilities.getBoardUtilitiesInstance;
 import static marcus.okodugha.chessv1.View.BoardView.getViewInstance;
@@ -29,7 +31,7 @@ public class Board {
     Infinity infinityWhite;
     Infinity infinityBlack;
     private ArrayList<ArrayList<Piece>> board;
-    private Move latestMove;
+    public Move latestMove;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
     private Rules rules;
     public int nrOfMoves=0;
@@ -86,18 +88,30 @@ public class Board {
         Piece destPiece = board.get(move.destY).get(move.destX);
         board.get(srcY).get(srcX).setFirstMove(false);
 
-        getBoardUtilitiesInstance().handelMoveType(srcX, srcY, destX, destY);
+        getBoardUtilitiesInstance().handelMoveType(move,true);
         eval.getEval();
         nrOfMoves++;
         getBoardUtilitiesInstance().copyAndAdd(board);
 
-        if (DevTools.autoBlack)infinityBlack.infinityMove();
+        if (DevTools.autoBlack){
+//            Timer timer = new Timer();//todo impliment deley
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    infinityBlack.infinityMove();
+//                }
+//            }, 1000, 1000);
+////            timer.cancel();
+            infinityBlack.infinityMove();//original
+        }
+
 
 
         getAllLegalMoves();
         Sound.makeSound(destPiece);
         getViewInstance().show();
 
+            System.out.println(getTurnColor());
 
     }
     public ArrayList<Move> getAllLegalMoves(){
@@ -138,8 +152,13 @@ public class Board {
     }
 
     public boolean isWhiteTurn()
-    {
+        {
         return nrOfMoves%2==0;
+    }
+    public Color getTurnColor()
+    {
+        if (nrOfMoves%2==0)return Color.WHITE;
+        return Color.BLACK;
     }
 
 

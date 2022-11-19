@@ -2,6 +2,8 @@ package marcus.okodugha.chessv1.Model;
 
 import java.awt.*;
 
+import static marcus.okodugha.chessv1.View.BoardView.getViewInstance;
+
 public class Rules {
     private Board board;
     private Point intersectionPoint = new Point();
@@ -230,18 +232,13 @@ public class Rules {
         return board.emptyPiece.getColor();
     }
 
-//    private boolean yourKingWillBeInCheck(){
-//
-//    }
-    public boolean pawnPromotion(int srcX,int srcY,int destX,int destY,Piece piece){
+
+    public boolean pawnPromotion(Move move,Piece piece){
         if (piece.getPieceType()==PieceType.PAWN){
-            if (piece.getColor()==Color.WHITE&&destY==0){
-                board.getBoard().get(destY).set(destX,new Piece(Color.WHITE,PieceType.QUEEN,1));//white queen
+            if (piece.getColor()==Color.WHITE&&move.destY==0){
                 return true;
             }
-            if (piece.getColor()==Color.BLACK&&destY==7){
-                board.getBoard().get(destY).set(destX,new Piece(Color.BLACK,PieceType.QUEEN,7));//black queen
-                board.getBoard().get(srcY).set(srcX,board.emptyPiece);
+            if (piece.getColor()==Color.BLACK&&move.destY==7){
                 return true;
             }
         }
@@ -252,7 +249,6 @@ public class Rules {
             if (destPieceIsSameColor(destX,destY,piece)){//same color
                 if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.ROOK){
                     if (intersection(srcX, srcY, destX, destY) == null||board.getBoard().get(intersectionPoint.y).get(intersectionPoint.x).getPieceType()==PieceType.ROOK){
-//                        System.out.println("castlin legal");
                         return true;
                     }
                 }
