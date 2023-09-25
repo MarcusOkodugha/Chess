@@ -31,7 +31,7 @@ public class Board {
     Infinity infinityWhite;
     Infinity infinityBlack;
 //    private ArrayList<ArrayList<Piece>> board;
-    public Move latestMove;jn
+    public Move latestMove;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
     private Rules rules;
     public int nrOfMoves=0;
