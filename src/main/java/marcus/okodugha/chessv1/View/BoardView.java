@@ -169,6 +169,7 @@ public class BoardView  {
             }
             white = !white;
         }
+
         if (board.getLatestMove()!=null){
             paintTile(board.getLatestMove().srcX,board.getLatestMove().srcY,new Color(250, 246,122));//yellow
 //            250, 246,122
@@ -206,6 +207,8 @@ public class BoardView  {
             }
             k++;
         }
+        paintTile(srcX, srcY,new Color(204,153,255));//purpole
+
         board.legalMoves.clear();
         dynamicTile.setIcon(null);
     }

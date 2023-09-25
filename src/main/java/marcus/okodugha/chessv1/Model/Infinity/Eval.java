@@ -4,25 +4,32 @@ import marcus.okodugha.chessv1.Model.Board;
 import marcus.okodugha.chessv1.Model.Color;
 import marcus.okodugha.chessv1.Model.Piece;
 
+import java.util.ArrayList;
+
 import static marcus.okodugha.chessv1.Model.Board.column;
 import static marcus.okodugha.chessv1.Model.Board.row;
 
 public class Eval {
     private int eval;
-    private Board board;
+//    private Board board;
 
-    public Eval(Board board) {
-        this.board=board;
+//    public Eval(Board board) {
+//        this.board=board;
+//    }
+
+    public Eval() {
+
     }
-    public int getEval() {
+
+    public int getEval(ArrayList<ArrayList<Piece>>  board) {
         eval=0;
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
-                 if (board.getBoard().get(i).get(j).getColor()== Color.WHITE){//color is white eval +
-                    eval=eval+board.getBoard().get(i).get(j).getPieceType().getValue();
+                 if (board.get(i).get(j).getColor()== Color.WHITE){//color is white eval +
+                    eval=eval+board.get(i).get(j).getPieceType().getValue();
                 }
-                if (board.getBoard().get(i).get(j).getColor()== Color.BLACK){//color is black eval -
-                    eval=eval-board.getBoard().get(i).get(j).getPieceType().getValue();
+                if (board.get(i).get(j).getColor()== Color.BLACK){//color is black eval -
+                    eval=eval-board.get(i).get(j).getPieceType().getValue();
                 }
             }
         }
