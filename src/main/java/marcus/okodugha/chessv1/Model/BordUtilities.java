@@ -18,22 +18,7 @@ public class BordUtilities {
         }
         return bordUtilitiesInstance;
     }
-    public void simulateNMoves(int n){
-        //Här vill jag för varje lagliga move genomföra det movet.
-        //Sedan vill jag kolla varje lagliga move efter det movet.
-        //Sedan vill jag göra varje lagliga move från den nya utgångspunket osv till ett djup av n.
-        //Sedan vill jag retunera det bästa första movet som ger mig högs EVAL efer n moves
-        Rules rules = new Rules(getBoardInstance());
-        Board board = getBoardInstance();
-        board.getAllLegalMoves();
-        for (Move m1: board.getAllLegalMoves()) {
-            for (Move m2:quickMoveGetNewList(m1)) {
 
-            };
-
-        }
-
-    }
     public ArrayList<Point> getLegalMovesForPiece(int srcX, int srcY){
         Rules rules = new Rules(getBoardInstance());
         Board board= getBoardInstance();
@@ -45,6 +30,7 @@ public class BordUtilities {
                     }
                 }
             }
+
         }
         return board.legalMoves;
     }
@@ -91,8 +77,8 @@ public class BordUtilities {
         board.getBoard().get(srcY).set(srcX, srcPiece);
     }
 
-    public boolean quickMove(Move move,Board board){
-//        Board board= getBoardInstance();
+    public boolean quickMove(Move move){
+        Board board= getBoardInstance();
 
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
         Piece srcPiece; Piece destPiece; srcPiece=board.getBoard().get(srcY).get(srcX); destPiece=board.getBoard().get(destY).get(destX);
@@ -107,13 +93,6 @@ public class BordUtilities {
             return false;
         }
         return true;
-    }
-
-    public ArrayList<Move> quickMoveGetNewList(Move move){
-        //här vill jag ha en lista med moves efter att jag genomfört movet
-        Board boardCopy = new Board();
-
-
     }
 
     public void handelMoveType(Move move,boolean realMove) {

@@ -26,11 +26,11 @@ public class Board {
     public boolean[][] whiteAttacks =new boolean[row][column];
     public boolean autoMove=false;
 
-    Eval eval = new Eval();
+    Eval eval = new Eval(this);
     public ArrayList<ArrayList<ArrayList<Piece>>> gameStateList2 = new ArrayList<>();
     Infinity infinityWhite;
     Infinity infinityBlack;
-//    private ArrayList<ArrayList<Piece>> board;
+    private ArrayList<ArrayList<Piece>> board;
     public Move latestMove;
     public ArrayList<ArrayList<Piece>> boardAfterMove=new ArrayList<>();
     private Rules rules;
@@ -89,7 +89,7 @@ public class Board {
         board.get(srcY).get(srcX).setFirstMove(false);
 
         getBoardUtilitiesInstance().handelMoveType(move,true);
-        eval.getEval(board);
+        eval.getEval();
         nrOfMoves++;
         getBoardUtilitiesInstance().copyAndAdd(board);
 
@@ -114,7 +114,12 @@ public class Board {
             System.out.println(getTurnColor());
 
     }
-    public ArrayList<Move> getAllLegalMoves(Board board){//Heltekande funktion för att retunera alla lagliga moves
+    public ArrayList<Move> getAllLegalMoves(){
+        testlist.clear();//todo remove
+
+        whiteKingIsInCheck=false;
+        blackKingIsInCheck=false;
+        allLegalMoves.clear();
         allLegalWhiteMoves.clear();
         allLegalBlackMoves.clear();
         for (int i = 0; i < row; i++) {
@@ -126,7 +131,7 @@ public class Board {
                                 if (rules.kingIsInCheck(l,k)==Color.WHITE)whiteKingIsInCheck=true;
                                 if (rules.kingIsInCheck(l,k)==Color.BLACK)blackKingIsInCheck=true;
                             }
-                            if (getBoardUtilitiesInstance().quickMove(new Move(j,i,l,k),board)){
+                            if (getBoardUtilitiesInstance().quickMove(new Move(j,i,l,k))){
                                 allLegalMoves.add(new Move(j,i,l,k));
                                 if (board.get(i).get(j).getColor()==Color.WHITE){
                                     allLegalWhiteMoves.add(new Move(j,i,l,k));
