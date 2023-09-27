@@ -19,6 +19,16 @@ public class BordUtilities {
         return bordUtilitiesInstance;
     }
 
+    public void simulateMoves(ArrayList<ArrayList<Piece>> inputBoard){
+        Board board = getBoardInstance();
+        for (Move m1 :board.getAllLegalMoves(inputBoard)) {//hämta alla lagliga moves
+            quickMove(m1,inputBoard);
+//            for (Move m2:board.getAllLegalMoves(inputBoard)) {
+//                quickMove(m2,inputBoard);
+//            }
+        }
+    }
+
     public ArrayList<Point> getLegalMovesForPiece(int srcX, int srcY){
         Rules rules = new Rules(getBoardInstance());
         Board board= getBoardInstance();
@@ -30,71 +40,86 @@ public class BordUtilities {
                     }
                 }
             }
-
         }
         return board.legalMoves;
     }
 
 
-    public void getAllLegalMoves2(){
+//    public void getAllLegalMoves2(ArrayList<ArrayList<Piece>> inputBoard){
+//        Rules rules = new Rules(getBoardInstance());
+//        Board board= getBoardInstance();
+//
+//        board.whiteKingIsInCheck2=false;
+//        board.blackKingIsInCheck2=false;
+//        for (int i = 0; i < row; i++) {
+//            for (int j = 0; j < column; j++) {
+//                for (int k = 0; k < row; k++) {
+//                    for (int l = 0; l < column; l++) {
+//                        if (rules.isLegalMove(j,i,l,k,board.getBoard().get(i).get(j))){
+//                            if (rules.kingIsInCheck(l,k,inputBoard)!=board.emptyPiece.getColor()){
+//                                if (rules.kingIsInCheck(l,k,inputBoard)== Color.WHITE)board.whiteKingIsInCheck2=true;
+//                                if (rules.kingIsInCheck(l,k,inputBoard)==Color.BLACK)board.blackKingIsInCheck2=true;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    public void revertMove(int srcX, int srcY, int destX, int destY, Piece srcPiece, Piece destPiece,ArrayList<ArrayList<Piece>> inputBoard) {
         Rules rules = new Rules(getBoardInstance());
         Board board= getBoardInstance();
-
-        board.whiteKingIsInCheck2=false;
-        board.blackKingIsInCheck2=false;
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < column; j++) {
-                for (int k = 0; k < row; k++) {
-                    for (int l = 0; l < column; l++) {
-                        if (rules.isLegalMove(j,i,l,k,board.getBoard().get(i).get(j))){
-                            if (rules.kingIsInCheck(l,k)!=board.emptyPiece.getColor()){
-                                if (rules.kingIsInCheck(l,k)== Color.WHITE)board.whiteKingIsInCheck2=true;
-                                if (rules.kingIsInCheck(l,k)==Color.BLACK)board.blackKingIsInCheck2=true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public void revertMove(int srcX, int srcY, int destX, int destY, Piece srcPiece, Piece destPiece) {
-        Rules rules = new Rules(getBoardInstance());
-        Board board= getBoardInstance();
-        if (rules.destPieceIsSameColor(destX, destY,board.getBoard().get(srcY).get(srcX))){
-            board.getBoard().get(destY).set(destX, destPiece);
-            board.getBoard().get(srcY).set(srcX, srcPiece);
+        if (rules.destPieceIsSameColor(destX, destY,inputBoard.get(srcY).get(srcX))){
+            inputBoard.get(destY).set(destX, destPiece);
+            inputBoard.get(srcY).set(srcX, srcPiece);
             if (srcX < destX){//move is to the right
-                board.getBoard().get(destY).set(destX -1,board.emptyPiece);//king
-                board.getBoard().get(destY).set(destX -2,board.emptyPiece);//rook
+                inputBoard.get(destY).set(destX -1,board.emptyPiece);//king
+                inputBoard.get(destY).set(destX -2,board.emptyPiece);//rook
             }
             if (destX < srcX){//move is to the left
-                board.getBoard().get(destY).set(destX +2,board.emptyPiece);//king
-                board.getBoard().get(destY).set(destX +3,board.emptyPiece);//rook
+                inputBoard.get(destY).set(destX +2,board.emptyPiece);//king
+                inputBoard.get(destY).set(destX +3,board.emptyPiece);//rook
             }
         }
-        board.getBoard().get(destY).set(destX, destPiece);
-        board.getBoard().get(srcY).set(srcX, srcPiece);
+        inputBoard.get(destY).set(destX, destPiece);
+        inputBoard.get(srcY).set(srcX, srcPiece);
     }
 
-    public boolean quickMove(Move move){
+    public boolean quickMove(Move move,ArrayList<ArrayList<Piece>> inputBoard){
         Board board= getBoardInstance();
 
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
-        Piece srcPiece; Piece destPiece; srcPiece=board.getBoard().get(srcY).get(srcX); destPiece=board.getBoard().get(destY).get(destX);
+        Piece srcPiece; Piece destPiece; srcPiece=inputBoard.get(srcY).get(srcX); destPiece=inputBoard.get(destY).get(destX);
 
         handelMoveType(move,false);
 
-        getBoardUtilitiesInstance().getAllLegalMoves2();
+//       getAllLegalMoves2(inputBoard);
+       revertMove(srcX, srcY, destX, destY, srcPiece, destPiece,inputBoard);
 
-        getBoardUtilitiesInstance().revertMove(srcX, srcY, destX, destY, srcPiece, destPiece);
-
-        if (board.getBoard().get(srcY).get(srcX).getColor()==Color.WHITE&&board.whiteKingIsInCheck2||board.getBoard().get(srcY).get(srcX).getColor()==Color.BLACK&&board.blackKingIsInCheck2){//your king will be in check
+        if (inputBoard.get(srcY).get(srcX).getColor()==Color.WHITE&&board.whiteKingIsInCheck||inputBoard.get(srcY).get(srcX).getColor()==Color.BLACK&&board.blackKingIsInCheck){//your king will be in check
             return false;
         }
         return true;
     }
+    public ArrayList<ArrayList<Piece>> quickMoveReturnBoardAfterMove(Move move,ArrayList<ArrayList<Piece>> inputBoard){
+        Board board= getBoardInstance();
 
+        int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
+        Piece srcPiece; Piece destPiece; srcPiece=inputBoard.get(srcY).get(srcX); destPiece=inputBoard.get(destY).get(destX);
+        handelMoveType(move,false);
+//        getBoardUtilitiesInstance().getAllLegalMoves2();
+
+
+        getBoardUtilitiesInstance().revertMove(srcX, srcY, destX, destY, srcPiece, destPiece,inputBoard);
+
+        if (inputBoard.get(srcY).get(srcX).getColor()==Color.WHITE&&board.whiteKingIsInCheck||inputBoard.get(srcY).get(srcX).getColor()==Color.BLACK&&board.blackKingIsInCheck){//your king will be in check
+            ArrayList<ArrayList<Piece>> empty = new  ArrayList<ArrayList<Piece>>();
+            System.out.println("DET FANS INGET LAGLIGT MOVE FÖR KIG VA IN CHECK DÄRFÖR RETURNA DEN EMPTY");
+            return empty;
+        }
+        return inputBoard;
+    }
     public void handelMoveType(Move move,boolean realMove) {
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
         Rules rules = new Rules(getBoardInstance());

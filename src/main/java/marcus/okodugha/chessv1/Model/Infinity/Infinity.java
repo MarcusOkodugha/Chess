@@ -33,7 +33,7 @@ public class Infinity {
 
     public void updateAllLegalAiMoves(){
         allLegalAiMoves.clear();
-        board.getAllLegalMoves();
+        board.getAllLegalMoves(board.getBoard());
         if (color==Color.WHITE){
             allLegalAiMoves.addAll(board.allLegalWhiteMoves);
         }
@@ -74,7 +74,7 @@ public class Infinity {
         Random random = new Random();
         int r = random.nextInt(allLegalAiMoves.size()) ;
 
-        board.movePiece(allLegalAiMoves.get(r));
+        board.movePiece(allLegalAiMoves.get(r),board.getBoard());
 //        System.out.println("infinity tride to make a move");
         nrOfAiMoves++;
     }
@@ -86,7 +86,7 @@ public class Infinity {
 
         getHighestValueKillMove();
 
-        board.movePiece(bestMove);
+        board.movePiece(bestMove,board.getBoard());
     }
 
 
@@ -112,7 +112,7 @@ public class Infinity {
 //            System.out.println("random move");
         }
         nrOfAiMoves++;
-        board.movePiece(bestMove);
+        board.movePiece(bestMove,board.getBoard());
         bestMove=null;
     }
 
@@ -134,7 +134,7 @@ public class Infinity {
             bestMove=getRandomMove();
         }
         nrOfAiMoves++;
-        board.movePiece(bestMove);
+        board.movePiece(bestMove,board.getBoard());
         bestMove=null;
     }
 

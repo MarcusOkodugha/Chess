@@ -1,0 +1,12 @@
+Målet: på dev2 branchen skapa en infity vesion som kan se (n) antal steg in i framtiden
+
+Problemet: jag använder en singel instans av board i de flesta funktionerna.
+
+Osäker: Behöver jag göra att funktioneran tar in board eller kan jag använda mig av sama instans
+av bord för att göra simulationen?
+
+Lösnigen: sriv om all ställen som använder sig av board att ta in ett bräde av typen
+ArrayList<ArrayList<Piece>> board; som inparameter så att funktioneran blir återanvändingsbara.
+
+Nästa steg: simulera varje move från getAllLegalMoves sedan simulera varje move getAllLegalMoves
+i n djup. Alltås en simulation i en simulation med n djup

@@ -226,7 +226,7 @@ public class BoardView  {
     MouseListener mouseListener = new MouseListener() {@Override
         public void mouseClicked(MouseEvent e) {
             if (activPoint.x!=-1&&activPoint.y!=-1){
-                board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize));
+                board.movePiece(new Move(activPoint.x,activPoint.y,e.getX()/blockSize,e.getY()/blockSize),board.getBoard());
                 board.legalMoves.clear();
                 show();
                 activPoint.x=-1;
@@ -257,7 +257,7 @@ public class BoardView  {
             if (srcX==e.getX()/blockSize&&srcY==e.getY()/blockSize){//keeps showing legalmoves if mouse is released on srcX srcY
                 showLegalMovesForPiece(e);
             }else {
-                board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize));
+                board.movePiece(new Move(srcX,srcY,e.getX()/blockSize,e.getY()/blockSize),board.getBoard());
                 dynamicTile.setIcon(null);
                 show();
             }

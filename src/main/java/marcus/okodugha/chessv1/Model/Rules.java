@@ -1,6 +1,7 @@
 package marcus.okodugha.chessv1.Model;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 import static marcus.okodugha.chessv1.View.BoardView.getViewInstance;
 
@@ -225,11 +226,21 @@ public class Rules {
     private boolean isEnemy(int srcX, int srcY, int destX, int destY){
         return board.getBoard().get(srcY).get(srcX).getColor()!=board.getBoard().get(destY).get(destX).getColor();
     }
-    public Color kingIsInCheck(int destX, int destY){
-        if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
-             return board.getBoard().get(destY).get(destX).getColor();
+//    public Color kingIsInCheck(int destX, int destY){ //old version
+//        if (board.getBoard().get(destY).get(destX).getPieceType()==PieceType.KING){
+//             return board.getBoard().get(destY).get(destX).getColor();
+//        }
+//        return board.emptyPiece.getColor();
+//    }
+    public Color kingIsInCheck(int destX, int destY, ArrayList<ArrayList<Piece>> inputBoard){
+        if (inputBoard.get(destY).get(destX).getPieceType()==PieceType.KING){
+             return inputBoard.get(destY).get(destX).getColor();
         }
-        return board.emptyPiece.getColor();
+        return board.emptyPiece.getColor();//bör aldrig retunera
+    }
+
+    public boolean isKingInCheck(ArrayList<ArrayList<Piece>>inputBoard){//todo remove or implement
+        return false;
     }
 
 

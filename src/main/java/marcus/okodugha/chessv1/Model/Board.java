@@ -37,8 +37,8 @@ public class Board {
     public int nrOfMoves=0;
     public boolean whiteKingIsInCheck;
     public boolean blackKingIsInCheck;
-    public boolean whiteKingIsInCheck2;
-    public boolean blackKingIsInCheck2;
+//    public boolean whiteKingIsInCheck2;
+//    public boolean blackKingIsInCheck2;
     public boolean gamIsRunning=true;
     public static Board bordInstance;
 
@@ -63,7 +63,7 @@ public class Board {
 //        getAllLegalMoves();
     }
 
-    public void movePiece(Move move) {
+    public void movePiece(Move move,ArrayList<ArrayList<Piece>> inputBoard) {
         int srcX= move.srcX; int srcY= move.srcY; int destX= move.destX; int destY= move.destY;
         if (!gamIsRunning)return;
         if (!DevTools.devMode) {//todo remve outer if leav iner if
@@ -107,16 +107,15 @@ public class Board {
 
 
 
-        getAllLegalMoves();
+        getAllLegalMoves(inputBoard);
         Sound.makeSound(destPiece);
         getViewInstance().show();
 
             System.out.println(getTurnColor());
 
     }
-    public ArrayList<Move> getAllLegalMoves(){
+    public ArrayList<Move> getAllLegalMoves(ArrayList<ArrayList<Piece>> inputBoard){
         testlist.clear();//todo remove
-
         whiteKingIsInCheck=false;
         blackKingIsInCheck=false;
         allLegalMoves.clear();
@@ -126,19 +125,19 @@ public class Board {
             for (int j = 0; j < column; j++) {
                 for (int k = 0; k < row; k++) {
                     for (int l = 0; l < column; l++) {
-                        if (rules.isLegalMove(j,i,l,k,board.get(i).get(j))){
-                            if (rules.kingIsInCheck(l,k)!=emptyPiece.getColor()){
-                                if (rules.kingIsInCheck(l,k)==Color.WHITE)whiteKingIsInCheck=true;
-                                if (rules.kingIsInCheck(l,k)==Color.BLACK)blackKingIsInCheck=true;
+                        if (rules.isLegalMove(j,i,l,k,inputBoard.get(i).get(j))){
+                            if (rules.kingIsInCheck(l,k,inputBoard)!=emptyPiece.getColor()){
+                                if (rules.kingIsInCheck(l,k,inputBoard)==Color.WHITE)whiteKingIsInCheck=true;
+                                if (rules.kingIsInCheck(l,k,inputBoard)==Color.BLACK)blackKingIsInCheck=true;
                             }
-                            if (getBoardUtilitiesInstance().quickMove(new Move(j,i,l,k))){
+                            if (getBoardUtilitiesInstance().quickMove(new Move(j,i,l,k),inputBoard)){
                                 allLegalMoves.add(new Move(j,i,l,k));
-                                if (board.get(i).get(j).getColor()==Color.WHITE){
+                                if (inputBoard.get(i).get(j).getColor()==Color.WHITE){
                                     allLegalWhiteMoves.add(new Move(j,i,l,k));
                                     whiteAttacks[l][k]=true;
                                     testlist.add(new Move(j,i,l,k));//todo remove
                                 }else {whiteAttacks[l][k]=false;}
-                                if (board.get(i).get(j).getColor()==Color.BLACK){
+                                if (inputBoard.get(i).get(j).getColor()==Color.BLACK){
                                     allLegalBlackMoves.add(new Move(j,i,l,k));
                                     blackAttacks[l][k]=true;
                                 }else {blackAttacks[l][k]=false;}
